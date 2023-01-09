@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- standard bottom navigation bar -->
+    <!-- standard bottom navigation bar
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_view"
         android:layout_width="0dp"
@@ -18,6 +18,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:menu="@menu/bottom_nav_menu" />
+        -->
     <!-- I think the top bar-->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -27,8 +28,9 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="match_parent"
             android:background="?attr/colorPrimary"
+            app:navigationIcon="@drawable/ic_launcher_foreground"
             app:popupTheme="@style/Theme.MyApplication.PopupOverlay" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -44,6 +46,8 @@
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="16dp"
         android:contentDescription="@string/app_name"
+        android:rotationX="46"
+        android:rotationY="26"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
