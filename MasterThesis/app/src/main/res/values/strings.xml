@@ -1,5 +1,7 @@
 <resources>
-    <string name="app_name">My Application</string>
-    <string name="button">Button</string>
+    <string name="app_name">SmartBodySensor</string>
     <string name="here_are_device_names">here are device names</string>
+    <string name="scan">Scan</string>
+    <string name="device_info_2">Device Info 2</string>
+    <string name="device_info_3">Device Info 3</string>
 </resources>
