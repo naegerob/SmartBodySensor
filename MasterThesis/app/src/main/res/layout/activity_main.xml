@@ -1,86 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/tvDeviceInfo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="false"
-        android:text="@string/here_are_device_names"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:textColor="#3F51B5"
-        app:layout_constraintBottom_toTopOf="@+id/buttonscan"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.542"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.333" />
-
-    <TextView
-        android:id="@+id/tvDeviceInfo2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="220dp"
-        android:clickable="false"
-        android:text="@string/device_info_2"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:textColor="#3F51B5"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvDeviceList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.517"
-        tools:itemCount="6" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/tvDeviceInfo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/device_address"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/device_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
     <Button
         android:id="@+id/buttonscan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="116dp"
+        android:layout_alignTop="@id/rvDeviceList"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="400dp"
         android:onClick="btScan"
-        android:text="@string/scan"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.507"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:text="@string/scan" />
+
+    <TextView
+        android:id="@+id/tvDeviceInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="100dp"
+        android:text="@string/here_are_device_names"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="#3F51B5"
+        android:textSize="15sp" />
+
+    <!--
+    <ListView
+        android:id="@+id/lvDeviceList"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_alignTop="@id/tvDeviceInfo"
+        android:layout_marginTop="45dp" />
+    -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvDeviceList"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_alignTop="@id/tvDeviceInfo"
+        android:textAlignment="center"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="29dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="50dp"
+        android:background="@color/white"
+        android:textDirection="firstStrong"
+        tools:itemCount="10" />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/device_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+    <TextView
+        android:id="@+id/device_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp" />
+</RelativeLayout>

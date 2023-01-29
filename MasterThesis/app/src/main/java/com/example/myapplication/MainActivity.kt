@@ -21,13 +21,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import org.w3c.dom.Text
 
+@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity()
 {
 
@@ -38,8 +41,12 @@ class MainActivity : AppCompatActivity()
 
     private val bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
 
+    private val scanSettings = ScanSettings.Builder()
+        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+        .build()
 
     private val scanCallback = object : ScanCallback() {
+
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             super.onScanResult(callbackType, result)
             deviceList.add(result.device)
@@ -49,14 +56,12 @@ class MainActivity : AppCompatActivity()
         }
         override fun onScanFailed(errorCode: Int) {
             super.onScanFailed(errorCode)
-            printInfo("Scan Failed")
-            //Toast.makeText(this, "Scan Failed", Toast.LENGTH_SHORT).show()
             // Handle scan failures
             when (errorCode) {
-                SCAN_FAILED_ALREADY_STARTED -> Log.e(TAG, "Scan failed, already started")
-                SCAN_FAILED_APPLICATION_REGISTRATION_FAILED -> Log.e(TAG, "Scan failed, application registration failed")
-                SCAN_FAILED_FEATURE_UNSUPPORTED -> Log.e(TAG, "Scan failed, feature unsupported")
-                SCAN_FAILED_INTERNAL_ERROR -> Log.e(TAG, "Scan failed, internal error")
+                SCAN_FAILED_ALREADY_STARTED -> printInfo( "Scan failed, already started")
+                SCAN_FAILED_APPLICATION_REGISTRATION_FAILED -> printInfo("Scan failed, application registration failed")
+                SCAN_FAILED_FEATURE_UNSUPPORTED -> printInfo("Scan failed, feature unsupported")
+                SCAN_FAILED_INTERNAL_ERROR -> printInfo("Scan failed, internal error")
             }
         }
         override fun onBatchScanResults(results: List<ScanResult>) {
@@ -74,12 +79,22 @@ class MainActivity : AppCompatActivity()
         setContentView(R.layout.activity_main)
         val recyclerView = findViewById<RecyclerView>(R.id.rvDeviceList)
 
+
         adapter = DeviceAdapter(deviceList)
         recyclerView.adapter = adapter
+
         recyclerView.layoutManager = LinearLayoutManager(this)
         // Check for BLE
         configBLE()
+        if (bluetoothAdapter == null)
+        {
+            printInfo("BluetoothAdapter is null")
+        }
+        if (bluetoothLeScanner == null)
+        {
 
+            Toast.makeText(this, "bluetoothScanner is null", Toast.LENGTH_SHORT).show()
+        }
     }
     private fun printInfo(msg :String)
     {
@@ -100,37 +115,38 @@ class MainActivity : AppCompatActivity()
         else {
             if (!bluetoothAdapter.isEnabled)
             {
-                val REQUEST_ENABLE_BT: Int = 1
-                val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-
                 printInfo("Bluetooth is not enabled")
 
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
-                    != PackageManager.PERMISSION_GRANTED)
-                {
-                    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
-                }
             }
             else
             {
                 printInfo("Bluetooth is enabled")
-                // Request user to enable BLE
-
+            }
+            val REQUEST_ENABLE_BT: Int = 1000
+            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+                != PackageManager.PERMISSION_GRANTED)
+            {
+                printInfo("Request Permission")
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    REQUEST_ENABLE_BT)
             }
         }
     }
 
     @SuppressLint("MissingPermission")
     fun btScan(view: View) {
-
+        //val filter:
         // Stop after 10s
         val handler = Handler()
         handler.postDelayed({
             bluetoothLeScanner?.stopScan(scanCallback)
             printInfo("Scan stopped")
-        }, 10000) //10s
-        bluetoothLeScanner?.startScan(null, ScanSettings.Builder().build(), scanCallback)
-        Toast.makeText(this, "btScan klicked", Toast.LENGTH_SHORT).show()
+        }, 10_000) //10s
+        bluetoothLeScanner?.startScan(null, scanSettings, scanCallback)
     }
 }
 
@@ -152,12 +168,15 @@ class DeviceAdapter(private val deviceList: List<BluetoothDevice>) : RecyclerVie
 }
 
 class DeviceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val deviceName: TextView = itemView.findViewById(R.id.device_name)
-    private val deviceAddress: TextView = itemView.findViewById(R.id.device_address)
+    //private val deviceName: TextView = itemView.findViewById(R.id.device_name)
+    private val deviceAddress: TextView = itemView.findViewById(R.id.tvDeviceInfo)
 
     @SuppressLint("MissingPermission")
     fun bind(device: BluetoothDevice) {
-        itemView.findViewById<TextView>(R.id.device_name).text = device.name
-        itemView.findViewById<TextView>(R.id.device_address).text = device.address
+        //itemView.findViewById<TextView>(R.id.device_name).text = device.name
+        itemView.findViewById<TextView>(R.id.tvDeviceInfo).text = device.address
+
+        itemView.device_name.text = device.name
+        itemView.device_address.text = device.address
     }
 }
