@@ -6,16 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/buttonscan"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@id/rvDeviceList"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="400dp"
-        android:onClick="btScan"
-        android:text="@string/scan" />
-
     <TextView
         android:id="@+id/tvDeviceInfo"
         android:layout_width="match_parent"
@@ -29,7 +19,7 @@
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="#3F51B5"
-        android:textSize="15sp" />
+        android:textSize="21sp" />
 
     <!--
     <ListView
@@ -39,31 +29,46 @@
         android:layout_alignTop="@id/tvDeviceInfo"
         android:layout_marginTop="45dp" />
     -->
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvDeviceList"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="220dp"
         android:layout_alignTop="@id/tvDeviceInfo"
-        android:textAlignment="center"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="29dp"
-        android:layout_marginEnd="50dp"
-        android:layout_marginBottom="50dp"
-        android:background="@color/white"
-        android:textDirection="firstStrong"
+        android:layout_marginStart="75dp"
+        android:layout_marginTop="75dp"
+        android:textAlignment="center"
         tools:itemCount="10" />
 
+    <TextView
+        android:id="@+id/tvdevice_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/buttonscan"
+        android:layout_marginBottom="-73dp"
+        android:text="device address"
+        android:textAlignment="center"
+        android:textSize="16sp" />
 
     <TextView
-        android:id="@+id/device_name"
+        android:id="@+id/tvdevice_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/tvdevice_address"
+        android:layout_marginBottom="-36dp"
+        android:text="device name"
+        android:textAlignment="center"
         android:textSize="20sp"
         android:textStyle="bold" />
-    <TextView
-        android:id="@+id/device_address"
-        android:layout_width="match_parent"
+
+    <Button
+        android:id="@+id/buttonscan"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16sp" />
+        android:layout_alignBottom="@id/rvDeviceList"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="-81dp"
+        android:onClick="btScan"
+        android:text="@string/scan" />
 </RelativeLayout>

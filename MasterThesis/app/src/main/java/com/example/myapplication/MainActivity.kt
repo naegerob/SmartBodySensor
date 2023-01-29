@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.UiModeManager.MODE_NIGHT_NO
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothAdapter.checkBluetoothAddress
 import android.bluetooth.BluetoothAdapter.getDefaultAdapter
@@ -25,6 +26,7 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,13 +38,12 @@ class MainActivity : AppCompatActivity()
 
     private lateinit var adapter: DeviceAdapter
     private val deviceList = mutableListOf<BluetoothDevice>()
-
     private val bluetoothAdapter: BluetoothAdapter? = getDefaultAdapter()
-
     private val bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
 
     private val scanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+        .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
         .build()
 
     private val scanCallback = object : ScanCallback() {
@@ -52,7 +53,7 @@ class MainActivity : AppCompatActivity()
             deviceList.add(result.device)
             adapter.notifyDataSetChanged()
             printInfo("Device added to list")
-
+            Log.d("MainActivity", "onScanResult called")
         }
         override fun onScanFailed(errorCode: Int) {
             super.onScanFailed(errorCode)
@@ -79,7 +80,6 @@ class MainActivity : AppCompatActivity()
         setContentView(R.layout.activity_main)
         val recyclerView = findViewById<RecyclerView>(R.id.rvDeviceList)
 
-
         adapter = DeviceAdapter(deviceList)
         recyclerView.adapter = adapter
 
@@ -95,13 +95,15 @@ class MainActivity : AppCompatActivity()
 
             Toast.makeText(this, "bluetoothScanner is null", Toast.LENGTH_SHORT).show()
         }
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        Log.d("MainActivity", "onCreate called")
     }
+
     private fun printInfo(msg :String)
     {
         val textview: TextView = findViewById(R.id.tvDeviceInfo)
         textview.text = msg
     }
-
 
     /*
      *  Check for BLE enabling of the device
@@ -116,7 +118,6 @@ class MainActivity : AppCompatActivity()
             if (!bluetoothAdapter.isEnabled)
             {
                 printInfo("Bluetooth is not enabled")
-
             }
             else
             {
@@ -124,7 +125,7 @@ class MainActivity : AppCompatActivity()
             }
             val REQUEST_ENABLE_BT: Int = 1000
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED)
             {
                 printInfo("Request Permission")
@@ -154,6 +155,7 @@ class DeviceAdapter(private val deviceList: List<BluetoothDevice>) : RecyclerVie
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.activity_main, parent, false)
+        Log.d("DeviceAdapter", "OnCreateViewHolder called")
         return DeviceViewHolder(view)
     }
 
@@ -164,19 +166,20 @@ class DeviceAdapter(private val deviceList: List<BluetoothDevice>) : RecyclerVie
     override fun onBindViewHolder(holder: DeviceViewHolder, position: Int) {
         val device = deviceList[position]
         holder.bind(device)
+
+        Log.d("DeviceAdapter", "onBindViewHolder called")
     }
 }
 
 class DeviceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    //private val deviceName: TextView = itemView.findViewById(R.id.device_name)
-    private val deviceAddress: TextView = itemView.findViewById(R.id.tvDeviceInfo)
 
     @SuppressLint("MissingPermission")
     fun bind(device: BluetoothDevice) {
-        //itemView.findViewById<TextView>(R.id.device_name).text = device.name
-        itemView.findViewById<TextView>(R.id.tvDeviceInfo).text = device.address
 
-        itemView.device_name.text = device.name
-        itemView.device_address.text = device.address
+        //itemView.findViewById<TextView>(R.id.tvdevice_name).text = device.name
+        itemView.tvdevice_address.text = device.address
+        itemView.findViewById<RecyclerView>(R.id.rvDeviceList).
+
+        Log.d("DeviceViewHolder", "bind called" + device.name.toString() + " " + device.address.toString())
     }
 }
