@@ -33,7 +33,7 @@ import androidx.recyclerview.widget.RecyclerView
 import org.w3c.dom.Text
 
 @Suppress("DEPRECATION")
-class MainActivity : rvInterface, AppCompatActivity()
+class MainActivity : AppCompatActivity()
 {
 
     private lateinit var adapter: DeviceAdapter
@@ -41,8 +41,6 @@ class MainActivity : rvInterface, AppCompatActivity()
     private val bluetoothAdapter: BluetoothAdapter? = getDefaultAdapter()
     private val bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
     private lateinit var recyclerView: RecyclerView
-
-    private lateinit var rvinterface: rvInterface;
 
     private val scanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -160,9 +158,5 @@ class MainActivity : rvInterface, AppCompatActivity()
         bluetoothLeScanner?.startScan(null, scanSettings, scanCallback)
     }
 
-    override fun onItemClick(position: Int)
-    {
-        TODO("Not yet implemented")
-    }
 }
 
