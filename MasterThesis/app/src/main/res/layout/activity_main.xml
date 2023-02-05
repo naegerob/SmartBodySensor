@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="10dp"
     tools:context=".MainActivity">
 
     <TextView
@@ -21,51 +22,19 @@
         android:textColor="#3F51B5"
         android:textSize="21sp" />
 
-    <!--
-    <ListView
-        android:id="@+id/lvDeviceList"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_alignTop="@id/tvDeviceInfo"
-        android:layout_marginTop="45dp" />
-    -->
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvDeviceList"
         android:layout_width="match_parent"
-        android:layout_height="220dp"
+        android:layout_height="300dp"
+
+        android:scrollbars="vertical"
         android:layout_alignTop="@id/tvDeviceInfo"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="75dp"
         android:layout_marginTop="75dp"
         android:textAlignment="center"
-        android:background="@drawable/borderlines"
-        app:layoutManager="LinearLayoutManager"
-        />
-    <!--
-        <TextView
-            android:id="@+id/tvdevice_address"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:layout_marginTop="20dp"
-            android:text="device address"
-            android:textAlignment="center"
-            />
-
-        <TextView
-            android:id="@+id/tvdevice_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:layout_marginTop="50dp"
-            android:text="device name"
-            android:textAlignment="center" />
-    -->
-
-
-
-
+        android:nestedScrollingEnabled="false"
+        app:layoutManager="LinearLayoutManager"/>
 
         <Button
             android:id="@+id/buttonscan"
