@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity()
     private val deviceList = mutableListOf<BluetoothDevice>()
     private val bluetoothAdapter: BluetoothAdapter? = getDefaultAdapter()
     private val bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
+    private lateinit var recyclerView: RecyclerView
 
     private val scanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -78,7 +79,7 @@ class MainActivity : AppCompatActivity()
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val recyclerView = findViewById<RecyclerView>(R.id.rvDeviceList)
+        recyclerView = findViewById<RecyclerView>(R.id.rvDeviceList)
 
         adapter = DeviceAdapter(deviceList)
         recyclerView.adapter = adapter
@@ -154,7 +155,7 @@ class MainActivity : AppCompatActivity()
 class DeviceAdapter(private val deviceList: List<BluetoothDevice>) : RecyclerView.Adapter<DeviceViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.activity_main, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_device, parent, false)
         Log.d("DeviceAdapter", "OnCreateViewHolder called")
         return DeviceViewHolder(view)
     }
@@ -166,20 +167,23 @@ class DeviceAdapter(private val deviceList: List<BluetoothDevice>) : RecyclerVie
     override fun onBindViewHolder(holder: DeviceViewHolder, position: Int) {
         val device = deviceList[position]
         holder.bind(device)
-
         Log.d("DeviceAdapter", "onBindViewHolder called")
     }
 }
 
 class DeviceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
+    private val deviceName: TextView = itemView.findViewById(R.id.tvdevice_name)
+    private val deviceAddress: TextView = itemView.findViewById(R.id.tvdevice_address)
+
     @SuppressLint("MissingPermission")
     fun bind(device: BluetoothDevice) {
 
+        Log.d("DeviceViewHolder", "bind called " + device.name.toString() + " " + device.address.toString())
+        deviceName.text = device.name
+        deviceAddress.text = device.address
+        //itemView.findViewById<TextView>(R.id.tvdevice_address).text = device.address
         //itemView.findViewById<TextView>(R.id.tvdevice_name).text = device.name
-        itemView.tvdevice_address.text = device.address
-        itemView.findViewById<RecyclerView>(R.id.rvDeviceList).
-
-        Log.d("DeviceViewHolder", "bind called" + device.name.toString() + " " + device.address.toString())
+        //itemView.findViewById<RecyclerView>(R.id.rvDeviceList).
     }
 }

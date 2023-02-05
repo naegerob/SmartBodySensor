@@ -39,36 +39,41 @@
         android:layout_marginStart="75dp"
         android:layout_marginTop="75dp"
         android:textAlignment="center"
-        tools:itemCount="10" />
+        android:background="@drawable/borderlines"
+        app:layoutManager="LinearLayoutManager"
+        />
+    <!--
+        <TextView
+            android:id="@+id/tvdevice_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_marginTop="20dp"
+            android:text="device address"
+            android:textAlignment="center"
+            />
 
-    <TextView
-        android:id="@+id/tvdevice_address"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/buttonscan"
-        android:layout_marginBottom="-73dp"
-        android:text="device address"
-        android:textAlignment="center"
-        android:textSize="16sp" />
+        <TextView
+            android:id="@+id/tvdevice_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_marginTop="50dp"
+            android:text="device name"
+            android:textAlignment="center" />
+    -->
 
-    <TextView
-        android:id="@+id/tvdevice_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/tvdevice_address"
-        android:layout_marginBottom="-36dp"
-        android:text="device name"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/buttonscan"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/rvDeviceList"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="-81dp"
-        android:onClick="btScan"
-        android:text="@string/scan" />
-</RelativeLayout>
+
+
+
+        <Button
+            android:id="@+id/buttonscan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/rvDeviceList"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="-81dp"
+            android:onClick="btScan"
+            android:text="@string/scan" />
+    </RelativeLayout>
