@@ -1,36 +1,16 @@
 package com.example.myapplication
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.*
-import android.bluetooth.BluetoothClass.Device
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class DeviceAdapter(private val deviceList: List<BluetoothDevice>) : RecyclerView.Adapter<DeviceViewHolder>() {
 
-	// Define the interface for onClick listener
-	interface DeviceClickListener {
-		fun onDeviceClick(device: BluetoothDevice)
-	}
-
-	// Create a variable to store the onClick listener
-	//private var listener: OnDeviceClickListener? = null
-
-	// Set the onClick listener
-	/*fun setOnDeviceClickListener(listener: OnDeviceClickListener) {
-		this.listener = listener
-	}*/
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
 		val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_device, parent, false)
 		Log.d("DeviceAdapter", "OnCreateViewHolder called")
@@ -49,8 +29,9 @@ class DeviceAdapter(private val deviceList: List<BluetoothDevice>) : RecyclerVie
 		holder.bind(device)
 		Log.d("DeviceAdapter", "onBindViewHolder called")
 		holder.itemView.setOnClickListener {
+			// Handle clicks on recyclerView
 			val context = holder.itemView.context
-
+			// TODO Separate BluetoothHandler with DeviceAdapter
 			val connectGatt = device.connectGatt(context, false, gattCallback)
 			// TODO: Set to default is open
 			/*
