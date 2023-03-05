@@ -11,6 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 
 class DeviceAdapter(private val deviceList: List<BluetoothDevice>) : RecyclerView.Adapter<DeviceViewHolder>() {
 
+
+
+	private val bluetoothConnectionHandler = BluetoothConnectionHandler()
+
+
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
 		val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_device, parent, false)
 		Log.d("DeviceAdapter", "OnCreateViewHolder called")
@@ -22,7 +27,6 @@ class DeviceAdapter(private val deviceList: List<BluetoothDevice>) : RecyclerVie
 		return deviceList.size
 	}
 
-	@SuppressLint("MissingPermission")
 	override fun onBindViewHolder(holder: DeviceViewHolder, position: Int)
 	{
 		val device = deviceList[position]
@@ -31,40 +35,11 @@ class DeviceAdapter(private val deviceList: List<BluetoothDevice>) : RecyclerVie
 		holder.itemView.setOnClickListener {
 			// Handle clicks on recyclerView
 			val context = holder.itemView.context
-			// TODO Separate BluetoothHandler with DeviceAdapter
-			val connectGatt = device.connectGatt(context, false, gattCallback)
-			// TODO: Set to default is open
-			/*
-			holder.itemView.background = ContextCompat.getDrawable(
-				context, R.drawable.selected_device_in_list
-			)
-			*/
+			// Connect to device
+			bluetoothConnectionHandler.connectBluetoothDevice(context, device)
+
 		}
 	}
-	private val gattCallback = object : BluetoothGattCallback() {
-		// handle connection state changes, services discovered, etc.
-		//Log.d("DeviceAdapter", "Bluetoothcallback called")
-
-		@SuppressLint("MissingPermission")
-		override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-			if (newState == BluetoothProfile.STATE_CONNECTED) {
-				// Connection successful, discover services
-				gatt?.discoverServices()
-				Log.d("DeviceAdapter", "Connection successful")
-			}
-		}
-
-		override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
-			if (status == BluetoothGatt.GATT_SUCCESS) {
-				// Services discovered successfully
-				// Do something with the services
-
-				Log.d("DeviceAdapter", "Services discovered")
-				// TODO
-			}
-		}
-	}
-
 }
 
 
