@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         recyclerView = findViewById<RecyclerView>(R.id.rvDeviceList)
-        adapter = DeviceAdapter(deviceList)
+        adapter = DeviceAdapter(this, deviceList)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 

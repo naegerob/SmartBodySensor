@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.annotation.SuppressLint
 import android.bluetooth.*
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +10,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class DeviceAdapter(private val deviceList: List<BluetoothDevice>) : RecyclerView.Adapter<DeviceViewHolder>() {
+class DeviceAdapter(private val context: Context, private val deviceList: List<BluetoothDevice>) : RecyclerView.Adapter<DeviceViewHolder>() {
 
 
 
-	private val bluetoothConnectionHandler = BluetoothConnectionHandler()
+	private val bluetoothConnectionHandler = BluetoothConnectionHandler(context, "A4:C1:38:4B:DF:7C")
 
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {

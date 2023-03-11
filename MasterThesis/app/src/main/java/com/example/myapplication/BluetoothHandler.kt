@@ -6,10 +6,11 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
+import android.content.Intent
 import android.os.Handler
 import android.util.Log
 
-class BluetoothConnectionHandler() : BluetoothGattCallback() {
+class BluetoothConnectionHandler(private val context: Context, private val targetDeviceAddress: String) : BluetoothGattCallback() {
 
 
 	@SuppressLint("MissingPermission")
@@ -27,15 +28,18 @@ class BluetoothConnectionHandler() : BluetoothGattCallback() {
 		super.onConnectionStateChange(gatt, status, newState)
 		if (newState == BluetoothProfile.STATE_CONNECTED)
 		{
+			if (gatt.device.address == targetDeviceAddress) {
+				// Start the new activity here
+				startNewDataPresenter(targetDeviceAddress)
+			}
 			gatt.discoverServices()
-			Log.d("BluetoothHandler", "Services discovered")
+			Log.d("BluetoothHandler", "Connection successful")
 		}
 	}
 	override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
 		super.onServicesDiscovered(gatt, status)
 		if (status == BluetoothGatt.GATT_SUCCESS) {
-			//onDeviceConnected(gatt)
-			Log.d("BluetoothHandler", "Connection successful")
+			Log.d("BluetoothHandler", "Services discovered")
 		}
 	}
 	override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
@@ -50,9 +54,20 @@ class BluetoothConnectionHandler() : BluetoothGattCallback() {
 	}
 	override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
 		super.onCharacteristicChanged(gatt, characteristic)
-		// Characteristic value changed, do something
-		// TODO: Handle characteristic changed
-		Log.d("BluetoothHandler", "Charateristics changed")
+
+		//if (characteristic.uuid == YOUR_CHARACTERISTIC_UUID) {
+			val data = characteristic.value
+			// Process the received data
+		//}
+		Log.d("BluetoothHandler", "Characteristics changed")
+	}
+
+	fun startNewDataPresenter(targetDeviceAddress: String)
+	{
+		val intent = Intent(context, DataPresenter::class.java)
+		intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+		intent.putExtra("Key", targetDeviceAddress)
+		context.startActivity(intent)
 	}
 }
 
