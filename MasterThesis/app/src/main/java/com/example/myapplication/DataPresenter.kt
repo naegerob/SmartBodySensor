@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.SyncStateContract.Constants
 import android.widget.TextView
+import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
 
 class DataPresenter : AppCompatActivity()
 {
@@ -14,7 +15,7 @@ class DataPresenter : AppCompatActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_data_presenter)
 
-		deviceMacAddress = intent.getStringExtra("Key").toString()
+		deviceMacAddress = intent.getStringExtra(KEY_DEVICE_ADDRESS).toString()
 
 		val tvMacAddress = findViewById<TextView>(R.id.tvMacAddress)
 		tvMacAddress.text = deviceMacAddress

@@ -9,14 +9,38 @@ import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.util.Log
+import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
 
-class BluetoothConnectionHandler(private val context: Context, private val targetDeviceAddress: String) : BluetoothGattCallback() {
+class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCallback() {
 
 
-	@SuppressLint("MissingPermission")
-	fun connectBluetoothDevice(context: Context, device: BluetoothDevice)
+	private var btPeripheralList = ArrayList<BluetoothDevices>()
+
+
+	companion object {
+		const val TAG = "BluetoothHandler"
+	}
+
+	init
 	{
-		device.connectGatt(context, true, this)
+		addPeripheralsInList()
+	}
+	@SuppressLint("MissingPermission")
+	fun connectBluetoothDevice(device: BluetoothDevice)
+	{
+		val isTargetBlePeripheral = btPeripheralList.any { bleDevice ->
+			bleDevice.macAddress.contains(device.address.toString())
+		}
+		// Connect only if in Peripheral List
+		if (isTargetBlePeripheral)
+		{
+			Log.d(TAG, device.address.toString())
+			device.connectGatt(context, false, this)
+		}
+		else
+		{
+			// TODO: Notify not in correct list
+		}
 	}
 
 	/**
@@ -26,20 +50,34 @@ class BluetoothConnectionHandler(private val context: Context, private val targe
 	override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int)
 	{
 		super.onConnectionStateChange(gatt, status, newState)
+
 		if (newState == BluetoothProfile.STATE_CONNECTED)
 		{
-			if (gatt.device.address == targetDeviceAddress) {
-				// Start the new activity here
-				startNewDataPresenter(targetDeviceAddress)
-			}
+			startNewDataPresenter(gatt.device.address)
+
 			gatt.discoverServices()
-			Log.d("BluetoothHandler", "Connection successful")
+			Log.d(TAG, "Connection successful")
 		}
 	}
+
+	private fun addPeripheralsInList()
+	{
+		// Extend with
+		var btDevice = BluetoothDevices("Forerunner735XT", "F8:B6:6B:8E:EF:1F")
+		btPeripheralList.add(btDevice)
+		btDevice = BluetoothDevices("Samsung Series TV", "70:2A:D5:52:FF:81")
+		btPeripheralList.add(btDevice)
+		btDevice = BluetoothDevices("Petkit", "A4:C1:38:4B:DF:7C")
+		btPeripheralList.add(btDevice)
+		btDevice = BluetoothDevices("LEBose", "2C:41:A1:DA:C2:AF")
+		btPeripheralList.add(btDevice)
+	}
+
 	override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
 		super.onServicesDiscovered(gatt, status)
 		if (status == BluetoothGatt.GATT_SUCCESS) {
-			Log.d("BluetoothHandler", "Services discovered")
+			Log.d(TAG, "Services discovered")
+
 		}
 	}
 	override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
@@ -47,7 +85,7 @@ class BluetoothConnectionHandler(private val context: Context, private val targe
 		if (status == BluetoothGatt.GATT_SUCCESS) {
 			// Characteristic read, do something
 			// TODO: Handle characteristic read
-			Log.d("BluetoothHandler", "Characteristics read")
+			Log.d(TAG, "Characteristics read")
 		} else {
 			// TODO: Handle failed characteristic read
 		}
@@ -57,20 +95,21 @@ class BluetoothConnectionHandler(private val context: Context, private val targe
 
 		//if (characteristic.uuid == YOUR_CHARACTERISTIC_UUID) {
 			val data = characteristic.value
-			// Process the received data
+			// TODO: Process the received data
 		//}
-		Log.d("BluetoothHandler", "Characteristics changed")
+		Log.d(TAG, "Characteristics changed")
 	}
 
-	fun startNewDataPresenter(targetDeviceAddress: String)
+	private fun startNewDataPresenter(targetDeviceAddress: String)
 	{
 		val intent = Intent(context, DataPresenter::class.java)
 		intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-		intent.putExtra("Key", targetDeviceAddress)
+		intent.putExtra(KEY_DEVICE_ADDRESS, targetDeviceAddress)
+		//intent.putExtra(KEY_DEVICE_NAME, btPeripheralList)
 		context.startActivity(intent)
 	}
 }
-
+@SuppressLint("MissingPermission")
 class BluetoothScanHandler(private var deviceList: MutableList<BluetoothDevice>,
 						   private var adapter: DeviceAdapter) : ScanCallback() {
 
@@ -78,10 +117,18 @@ class BluetoothScanHandler(private var deviceList: MutableList<BluetoothDevice>,
 	private val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
 	private val bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
 
+	private val bondedDevices = bluetoothAdapter?.bondedDevices
+
 	private val scanSettings = ScanSettings.Builder()
 		.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
 		.setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
 		.build()
+
+
+	companion object {
+		const val TAG = "BluetoothScanHandler"
+	}
+
 
 	@SuppressLint("MissingPermission")
 	fun startScan()
@@ -115,16 +162,16 @@ class BluetoothScanHandler(private var deviceList: MutableList<BluetoothDevice>,
 		}
 		// TODO try to realize more specific
 		adapter.notifyDataSetChanged()
-		Log.d("MainActivity", "onScanResult called")
+		Log.d(TAG, "onScanResult called")
 	}
 	override fun onScanFailed(errorCode: Int) {
 		super.onScanFailed(errorCode)
 		// Handle scan failures
 		when (errorCode) {
-			SCAN_FAILED_ALREADY_STARTED -> Log.d("BluetoothScanCallback", "Scan failed, already started")
-			SCAN_FAILED_APPLICATION_REGISTRATION_FAILED -> Log.d("BluetoothScanCallback", "Scan failed, application registration failed")
-			SCAN_FAILED_FEATURE_UNSUPPORTED -> Log.d("BluetoothScanCallback", "Scan failed, feature unsupported")
-			SCAN_FAILED_INTERNAL_ERROR -> Log.d("BluetoothScanCallback", "Scan failed, internal error")
+			SCAN_FAILED_ALREADY_STARTED -> Log.d(TAG, "Scan failed, already started")
+			SCAN_FAILED_APPLICATION_REGISTRATION_FAILED -> Log.d(TAG, "Scan failed, application registration failed")
+			SCAN_FAILED_FEATURE_UNSUPPORTED -> Log.d(TAG, "Scan failed, feature unsupported")
+			SCAN_FAILED_INTERNAL_ERROR -> Log.d(TAG, "Scan failed, internal error")
 		}
 	}
 }
