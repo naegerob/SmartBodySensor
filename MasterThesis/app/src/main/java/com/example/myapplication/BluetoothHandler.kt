@@ -10,6 +10,7 @@ import android.content.Intent
 import android.os.Handler
 import android.util.Log
 import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
+import java.util.UUID
 
 class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCallback() {
 
@@ -19,6 +20,9 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 
 	companion object {
 		const val TAG = "BluetoothHandler"
+		val UUID_HEART_RATE_SERVICE: UUID				= UUID(0x180D.toLong(), 0x0000.toLong())
+		val UUID_HEART_RATE_CHARACTERISTICS: UUID 		= UUID(0x2A37.toLong(), 0x0000.toLong())
+		val UUID_HEART_RATE_DESCRIPTOR: UUID 			= UUID(0x2902.toLong(), 0x0000.toLong())
 	}
 
 	init
@@ -71,12 +75,24 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 		btPeripheralList.add(btDevice)
 		btDevice = BluetoothDevices("LEBose", "2C:41:A1:DA:C2:AF")
 		btPeripheralList.add(btDevice)
+		btDevice = BluetoothDevices("Smart Body Sensor", "CD:7A:3C:A7:19:3B")
+		btPeripheralList.add(btDevice)
 	}
 
+	@SuppressLint("MissingPermission")
 	override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
 		super.onServicesDiscovered(gatt, status)
 		if (status == BluetoothGatt.GATT_SUCCESS) {
 			Log.d(TAG, "Services discovered")
+			// Enable notification
+			val service = gatt.getService(UUID_HEART_RATE_SERVICE)
+			val characteristic = service.getCharacteristic(UUID_HEART_RATE_CHARACTERISTICS)
+
+			characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+			val descriptor = characteristic.getDescriptor(UUID_HEART_RATE_DESCRIPTOR)
+			descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+			gatt.writeDescriptor(descriptor)
+
 
 		}
 	}
@@ -85,6 +101,7 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 		if (status == BluetoothGatt.GATT_SUCCESS) {
 			// Characteristic read, do something
 			// TODO: Handle characteristic read
+
 			Log.d(TAG, "Characteristics read")
 		} else {
 			// TODO: Handle failed characteristic read
@@ -93,10 +110,10 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 	override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
 		super.onCharacteristicChanged(gatt, characteristic)
 
-		//if (characteristic.uuid == YOUR_CHARACTERISTIC_UUID) {
+		if (characteristic.uuid == UUID_HEART_RATE_CHARACTERISTICS) {
 			val data = characteristic.value
-			// TODO: Process the received data
-		//}
+		// TODO: Process the received data
+		}
 		Log.d(TAG, "Characteristics changed")
 	}
 
