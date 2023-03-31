@@ -10,12 +10,15 @@ import android.content.Intent
 import android.os.Handler
 import android.util.Log
 import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
+import com.example.myapplication.Constants.KEY_TEMP_DATA
 import java.util.UUID
 
 private const val SCAN_DURATION_MS = 5000L
 
 @SuppressLint("MissingPermission")
 class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCallback() {
+
+	private val dataPresenterIntent = Intent(context, DataPresenter::class.java)
 
 	private val peripheralList = listOf(
 		BluetoothDevices("Forerunner735XT", "F8:B6:6B:8E:EF:1F"),
@@ -48,7 +51,39 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 		}
 	}
 
+	/**
+	 * onCharacteristicRead is used for synchronous data exchange
+	 * onCharacteristicChanged is used for async data exchange
+	 */
+	override fun onCharacteristicRead(gatt: BluetoothGatt?,	characteristic: BluetoothGattCharacteristic, status: Int) {
+		super.onCharacteristicRead(gatt, characteristic, status)
+		if (status == BluetoothGatt.GATT_SUCCESS) {
+			characteristic.let { char ->
+				if (char.uuid == UUID_HEART_RATE_CHARACTERISTICS)
+				{
+					val byteArray = characteristic.value
+					Log.d(TAG, byteArray.toString())
+				}
+			}
+		} else {
+			Log.e(TAG, "onCharacteristicRead failed with status $status")
+		}
+	}
 
+	override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+		super.onCharacteristicChanged(gatt, characteristic)
+		if (characteristic.uuid == UUID_HEART_RATE_CHARACTERISTICS) {
+			val byteArray = characteristic.value
+			Log.d(TAG, byteArray.toString())
+			dataPresenterIntent.run {
+				putExtra(KEY_TEMP_DATA, byteArray.toString())
+				// several startActivity calls are handled in DataPresenter
+				dataPresenterIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+				context.startActivity(dataPresenterIntent)
+			}
+
+		}
+	}
 	override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
 		super.onConnectionStateChange(gatt, status, newState)
 		if (newState == BluetoothProfile.STATE_CONNECTED) {
@@ -58,6 +93,7 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 		} else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
 			Log.d(TAG, "${gatt.device.address} disconnected")
 			gatt.close()
+
 		}
 	}
 
@@ -65,16 +101,17 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 		super.onServicesDiscovered(gatt, status)
 		if (status == BluetoothGatt.GATT_SUCCESS) {
 			Log.d(TAG, "${gatt.device.address} services discovered")
-			val service = gatt.getService(UUID_HEART_RATE_SERVICE)
-			val characteristic = service?.getCharacteristic(UUID_HEART_RATE_CHARACTERISTICS)
-			characteristic?.let { char ->
-				char.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-				val descriptor = char.getDescriptor(UUID_HEART_RATE_DESCRIPTOR)
-				descriptor?.let { desc ->
+			val heartRateService = gatt.getService(UUID_HEART_RATE_SERVICE)
+			val heartRateCharacteristic = heartRateService?.getCharacteristic(UUID_HEART_RATE_CHARACTERISTICS)
+			heartRateCharacteristic?.let { heartRateChar ->
+				gatt.setCharacteristicNotification(heartRateChar, true)
+				heartRateChar.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+				val heartRateDescriptor = heartRateChar.getDescriptor(UUID_HEART_RATE_DESCRIPTOR)
+				heartRateDescriptor?.let { desc ->
 					desc.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
 					gatt.writeDescriptor(desc)
 				}
-				gatt.setCharacteristicNotification(char, true)
+				gatt.setCharacteristicNotification(heartRateChar, true)
 			}
 		} else {
 			Log.e(TAG, "${gatt.device.address} service discovery failed")
@@ -84,12 +121,12 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 
 	private fun startNewDataPresenter(targetDeviceAddress: String)
 	{
-		val intent = Intent(context, DataPresenter::class.java).run {
+
+		dataPresenterIntent.run {
 			flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
 			putExtra(KEY_DEVICE_ADDRESS, targetDeviceAddress)
 		}
-		//intent.putExtra(KEY_DEVICE_NAME, btPeripheralList)
-		context.startActivity(intent)
+		context.startActivity(dataPresenterIntent)
 	}
 }
 @SuppressLint("MissingPermission")
