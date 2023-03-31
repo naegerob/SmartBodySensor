@@ -10,7 +10,7 @@ import com.example.myapplication.Constants.KEY_TEMP_DATA
 
 class DataPresenter : AppCompatActivity()
 {
-	private var deviceMacAddress: String? = null
+	private lateinit var deviceMacAddress: String
 	private val tvData: TextView = findViewById(R.id.tvDummyText)
 
 
@@ -19,7 +19,7 @@ class DataPresenter : AppCompatActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_data_presenter)
 
-		deviceMacAddress = intent.getStringExtra(KEY_DEVICE_ADDRESS).toString()
+		this.deviceMacAddress = intent.getStringExtra(KEY_DEVICE_ADDRESS).toString()
 
 		val tvMacAddress = findViewById<TextView>(R.id.tvMacAddress)
 		tvMacAddress.text = deviceMacAddress

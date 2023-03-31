@@ -88,5 +88,11 @@ class MainActivity : AppCompatActivity()
         bleScanHandler.startScan()
     }
 
+
+    fun btBond(view: View)
+    {
+
+    }
+
 }
 

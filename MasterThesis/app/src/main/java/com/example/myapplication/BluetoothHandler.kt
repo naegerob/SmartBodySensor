@@ -2,11 +2,15 @@ package com.example.myapplication
 
 import android.annotation.SuppressLint
 import android.bluetooth.*
+import android.bluetooth.BluetoothClass.Device
 import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Handler
 import android.util.Log
 import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
@@ -19,14 +23,8 @@ private const val SCAN_DURATION_MS = 5000L
 class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCallback() {
 
 	private val dataPresenterIntent = Intent(context, DataPresenter::class.java)
-
-	private val peripheralList = listOf(
-		BluetoothDevices("Forerunner735XT", "F8:B6:6B:8E:EF:1F"),
-		BluetoothDevices("Samsung Series TV", "70:2A:D5:52:FF:81"),
-		BluetoothDevices("Petkit", "A4:C1:38:4B:DF:7C"),
-		BluetoothDevices("LEBose", "2C:41:A1:DA:C2:AF"),
-		BluetoothDevices("Smart Body Sensor", "CD:7A:3C:A7:19:3B")
-	)
+	private val bondStateReceiver = BondStateReceiver()
+	private val bondFilter = IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
 
 	companion object {
 		private const val TAG = "BluetoothHandler"
@@ -37,18 +35,13 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 
 	init {
 		Log.d(TAG, "Creating BluetoothConnectionHandler")
+		context.registerReceiver(bondStateReceiver, bondFilter)
 	}
 
 	fun connectBluetoothDevice(device: BluetoothDevice) {
-		val isTargetBlePeripheral = peripheralList.any { bleDevice ->
-			bleDevice.macAddress == device.address.toString()
-		}
-		if (isTargetBlePeripheral) {
-			Log.d(TAG, "Connecting to ${device.address}")
-			device.connectGatt(context, false, this)
-		} else {
-			Log.w(TAG, "${device.address} not in peripheral list")
-		}
+
+		Log.d(TAG, "Connecting to ${device.address}")
+		device.connectGatt(context, false, this)
 	}
 
 	/**
@@ -75,25 +68,26 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 		if (characteristic.uuid == UUID_HEART_RATE_CHARACTERISTICS) {
 			val byteArray = characteristic.value
 			Log.d(TAG, byteArray.toString())
+			/*
 			dataPresenterIntent.run {
 				putExtra(KEY_TEMP_DATA, byteArray.toString())
 				// several startActivity calls are handled in DataPresenter
 				dataPresenterIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
 				context.startActivity(dataPresenterIntent)
 			}
-
+			*/
 		}
 	}
 	override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
 		super.onConnectionStateChange(gatt, status, newState)
 		if (newState == BluetoothProfile.STATE_CONNECTED) {
 			Log.d(TAG, "${gatt.device.address} connected")
-			startNewDataPresenter(gatt.device.address)
+
 			gatt.discoverServices()
+			//startNewDataPresenter(gatt.device.address)
 		} else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
 			Log.d(TAG, "${gatt.device.address} disconnected")
 			gatt.close()
-
 		}
 	}
 
@@ -121,12 +115,12 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 
 	private fun startNewDataPresenter(targetDeviceAddress: String)
 	{
-
 		dataPresenterIntent.run {
 			flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
 			putExtra(KEY_DEVICE_ADDRESS, targetDeviceAddress)
+			context.startActivity(this)
 		}
-		context.startActivity(dataPresenterIntent)
+
 	}
 }
 @SuppressLint("MissingPermission")
@@ -139,13 +133,30 @@ class BluetoothScanHandler(private var deviceList: MutableList<BluetoothDevice>,
 	}
 	private val bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
 
-	private val bondedDevices = bluetoothAdapter?.bondedDevices
 
-	private val scanSettings = ScanSettings.Builder()
-		.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-		.setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
+
+	private val peripheralList = listOf(
+		BluetoothDevices("Forerunner735XT", "F8:B6:6B:8E:EF:1F"),
+		BluetoothDevices("Samsung Series TV", "70:2A:D5:52:FF:81"),
+		BluetoothDevices("Petkit", "A4:C1:38:4B:DF:7C"),
+		BluetoothDevices("LEBose", "2C:41:A1:DA:C2:AF"),
+		BluetoothDevices("Temp_Node", "CD:7A:3C:A7:19:3B")
+	)
+
+	private val bondedDevices = bluetoothAdapter?.bondedDevices
+	private val macAddressFilter: ScanFilter = ScanFilter.Builder()
+		.setDeviceName("Temp_Node") // Replace with your desired MAC address
 		.build()
 
+	// Create a list of ScanFilter objects that will be used to filter devices during the scan
+	private val filterList = listOf(macAddressFilter)
+	private val scanSettings = ScanSettings.Builder()
+		.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+		.setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE)
+		.setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
+		.setNumOfMatches(ScanSettings.MATCH_NUM_ONE_ADVERTISEMENT)
+		.setReportDelay(0)
+		.build()
 
 	companion object {
 		const val TAG = "BluetoothScanHandler"
@@ -159,7 +170,7 @@ class BluetoothScanHandler(private var deviceList: MutableList<BluetoothDevice>,
 		handler.postDelayed({
 			bluetoothLeScanner?.stopScan(this)
 		}, 5_000)
-		bluetoothLeScanner?.startScan(null, scanSettings, this)
+		bluetoothLeScanner?.startScan(filterList, scanSettings, this)
 	}
 
 	fun checkBLE() : Boolean
@@ -190,6 +201,39 @@ class BluetoothScanHandler(private var deviceList: MutableList<BluetoothDevice>,
 			SCAN_FAILED_APPLICATION_REGISTRATION_FAILED -> Log.d(TAG, "Scan failed, application registration failed")
 			SCAN_FAILED_FEATURE_UNSUPPORTED -> Log.d(TAG, "Scan failed, feature unsupported")
 			SCAN_FAILED_INTERNAL_ERROR -> Log.d(TAG, "Scan failed, internal error")
+		}
+	}
+}
+
+class BondStateReceiver : BroadcastReceiver() {
+
+	companion object {
+		private const val TAG = "BondStateReceiver"
+	}
+
+
+	override fun onReceive(context: Context?, intent: Intent?) {
+
+		Log.d(TAG, "OnReceive called")
+		val action = intent?.action
+
+		if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == action) {
+			val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+			val bondState = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR)
+			when (bondState) {
+				BluetoothDevice.BOND_BONDED -> {
+					// Device is bonded
+					Log.d(TAG, "${device!!.address} is bonded")
+				}
+				BluetoothDevice.BOND_BONDING -> {
+					// Device is bonding
+					Log.d(TAG, "${device!!.address} is bonding")
+				}
+				BluetoothDevice.BOND_NONE -> {
+					// Bond has been removed
+					Log.d(TAG, "${device!!.address} bond has been removed")
+				}
+			}
 		}
 	}
 }

@@ -26,6 +26,7 @@ class DeviceAdapter(private val context: Context, private val deviceList: List<B
 		return deviceList.size
 	}
 
+	@SuppressLint("MissingPermission")
 	override fun onBindViewHolder(holder: DeviceViewHolder, position: Int)
 	{
 		val device = deviceList[position]
@@ -34,7 +35,8 @@ class DeviceAdapter(private val context: Context, private val deviceList: List<B
 		holder.itemView.setOnClickListener {
 			// Handle clicks on recyclerView
 			// Connect to device
-			bluetoothConnectionHandler.connectBluetoothDevice(device)
+			//bluetoothConnectionHandler.connectBluetoothDevice(device)
+			device.createBond()
 
 		}
 	}

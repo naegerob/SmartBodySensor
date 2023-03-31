@@ -16,4 +16,7 @@
     <string name="received_data">Received data</string>
     <string name="disconnect">Disconnect</string>
     <string name="connected_with">Connected with ...</string>
+    <string name="device_address">device address</string>
+    <string name="device_name">device name</string>
+    <string name="bond">Bond</string>
 </resources>

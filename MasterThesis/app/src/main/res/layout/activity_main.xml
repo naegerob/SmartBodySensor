@@ -24,21 +24,21 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvDeviceList"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:scrollbars="vertical"
+        android:layout_width="317dp"
+        android:layout_height="168dp"
         android:layout_alignTop="@id/tvDeviceInfo"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="75dp"
         android:layout_marginTop="75dp"
-        android:textAlignment="center"
-        android:nestedScrollingEnabled="false"
         android:clickable="true"
         android:contextClickable="true"
-        app:layoutManager="LinearLayoutManager"/>
+        android:nestedScrollingEnabled="false"
+        android:scrollbars="vertical"
+        android:textAlignment="center"
+        app:layoutManager="LinearLayoutManager" />
 
         <Button
-            android:id="@+id/buttonscan"
+            android:id="@+id/buttonScan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/rvDeviceList"
@@ -46,4 +46,14 @@
             android:layout_marginBottom="-81dp"
             android:onClick="btScan"
             android:text="@string/scan" />
-    </RelativeLayout>
+
+        <Button
+            android:id="@+id/buttonBond"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/rvDeviceList"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="-154dp"
+            android:onClick="btBond"
+            android:text="@string/bond" />
+</RelativeLayout>
