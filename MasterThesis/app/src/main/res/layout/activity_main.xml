@@ -47,13 +47,13 @@
             android:onClick="btScan"
             android:text="@string/scan" />
 
-        <Button
-            android:id="@+id/buttonBond"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/rvDeviceList"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="-154dp"
-            android:onClick="btBond"
-            android:text="@string/bond" />
+    <Button
+        android:id="@+id/buttonConnect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/rvDeviceList"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="-154dp"
+        android:onClick="btConnectSensor"
+        android:text="@string/connect_with_sensor" />
 </RelativeLayout>

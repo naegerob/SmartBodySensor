@@ -19,4 +19,6 @@
     <string name="device_address">device address</string>
     <string name="device_name">device name</string>
     <string name="bond">Bond</string>
+    <string name="connect_with_sensor">Connect with Sensor</string>
+    <string name="macaddress">MacAddress</string>
 </resources>

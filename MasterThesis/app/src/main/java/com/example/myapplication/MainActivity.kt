@@ -25,7 +25,11 @@ class MainActivity : AppCompatActivity()
     private lateinit var recyclerView: RecyclerView
     // Bluetooth Handlers
     private lateinit var bleScanHandler : BluetoothScanHandler
+    private lateinit var bluetoothConnectionHandler: BluetoothConnectionHandler
 
+    companion object {
+        private const val TAG = "MainActivity"
+    }
 
     /***
      * Methods
@@ -40,6 +44,7 @@ class MainActivity : AppCompatActivity()
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         bleScanHandler = BluetoothScanHandler(deviceList, adapter)
+        bluetoothConnectionHandler = BluetoothConnectionHandler(this)
         printInfo("Enable GPS!")
         // Check for BLE
         configBLE()
@@ -89,10 +94,13 @@ class MainActivity : AppCompatActivity()
     }
 
 
-    fun btBond(view: View)
+    @SuppressLint("MissingPermission")
+    fun btConnectSensor(view: View)
     {
-
+        printInfo("Connect to Sensor")
+        bluetoothConnectionHandler.connectOrBondSensor()
     }
 
 }
+
 

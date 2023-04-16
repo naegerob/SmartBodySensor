@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class DeviceAdapter(private val context: Context, private val deviceList: List<BluetoothDevice>) : RecyclerView.Adapter<DeviceViewHolder>() {
 
-	private val bluetoothConnectionHandler = BluetoothConnectionHandler(context)
+	//private val bluetoothConnectionHandler = BluetoothConnectionHandler(context)
 
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
@@ -35,9 +35,7 @@ class DeviceAdapter(private val context: Context, private val deviceList: List<B
 		holder.itemView.setOnClickListener {
 			// Handle clicks on recyclerView
 			// Connect to device
-			//bluetoothConnectionHandler.connectBluetoothDevice(device)
-			device.createBond()
-
+			//bluetoothConnectionHandler.connectOrBondSensor()
 		}
 	}
 }
