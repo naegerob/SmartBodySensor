@@ -149,7 +149,6 @@ class BluetoothScanHandler(private var deviceList: MutableList<BluetoothDevice>,
 	}
 	private val bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
 
-
 	private val bondedDevices = bluetoothAdapter?.bondedDevices
 	private val macAddressFilter: ScanFilter = ScanFilter.Builder()
 		.setDeviceName("Temp_Node") // Replace with your desired MAC address
