@@ -17,14 +17,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 @Suppress("DEPRECATION")
-class MainActivity : AppCompatActivity()
-{
+class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: DeviceAdapter
     private val deviceList = mutableListOf<BluetoothDevice>()
     private lateinit var recyclerView: RecyclerView
+
     // Bluetooth Handlers
-    private lateinit var bleScanHandler : BluetoothScanHandler
+    private lateinit var bleScanHandler: BluetoothScanHandler
     private lateinit var bluetoothConnectionHandler: BluetoothConnectionHandler
 
     companion object {
@@ -34,8 +34,7 @@ class MainActivity : AppCompatActivity()
     /***
      * Methods
      */
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         recyclerView = findViewById<RecyclerView>(R.id.rvDeviceList)
@@ -55,48 +54,42 @@ class MainActivity : AppCompatActivity()
     /*
      *  Check for BLE enabling of the device
      */
-    private fun configBLE()
-    {
-       if(!bleScanHandler.checkBLE())
-       {
-           printInfo("BLE adapter is null")
-           return
-       }
-       val REQUEST_ENABLE_BT = 1000
-       val LOCATION_PERMISSION_REQUEST_CODE = 1
-       val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-       if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
-           != PackageManager.PERMISSION_GRANTED
-       )
-       {
-           printInfo("Request Permission")
-           startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
+    private fun configBLE() {
+        if (!bleScanHandler.checkBLE()) {
+            printInfo("BLE adapter is null")
+            return
+        }
+        val REQUEST_ENABLE_BT = 1000
+        val LOCATION_PERMISSION_REQUEST_CODE = 1
+        val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            printInfo("Request Permission")
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
 
-           ActivityCompat.requestPermissions(
-               this,
-               arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-               LOCATION_PERMISSION_REQUEST_CODE
-           )
-       }
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        }
     }
 
-    private fun printInfo(msg :String)
-    {
+    private fun printInfo(msg: String) {
         val textview: TextView = findViewById(R.id.tvDeviceInfo)
         textview.text = msg
     }
 
     @SuppressLint("MissingPermission")
-    fun btScan(view: View)
-    {
+    fun btScan(view: View) {
         printInfo("start BLE Scan")
         bleScanHandler.startScan()
     }
 
 
     @SuppressLint("MissingPermission")
-    fun btConnectSensor(view: View)
-    {
+    fun btConnectSensor(view: View) {
         printInfo("Connect to Sensor")
         bluetoothConnectionHandler.connectOrBondSensor()
     }

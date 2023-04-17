@@ -37,15 +37,15 @@
         android:textAlignment="center"
         app:layoutManager="LinearLayoutManager" />
 
-        <Button
-            android:id="@+id/buttonScan"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/rvDeviceList"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="-81dp"
-            android:onClick="btScan"
-            android:text="@string/scan" />
+    <Button
+        android:id="@+id/buttonScan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/rvDeviceList"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="-81dp"
+        android:onClick="btScan"
+        android:text="@string/scan" />
 
     <Button
         android:id="@+id/buttonConnect"
