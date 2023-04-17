@@ -90,7 +90,7 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
             Log.d(TAG, "onCharacteristicChanged $byteArray")
 
             dataPresenterIntent.run {
-                putExtra(KEY_TEMP_DATA, byteArray.toString())
+                putExtra(KEY_TEMP_DATA, byteArray.contentToString())
                 // several startActivity calls are handled in DataPresenter
                 dataPresenterIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 context.startActivity(dataPresenterIntent)
