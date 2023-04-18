@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class DeviceAdapter(private val context: Context, private val deviceList: List<BluetoothDevice>) :
@@ -15,7 +16,7 @@ class DeviceAdapter(private val context: Context, private val deviceList: List<B
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.list_item_device, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.list_item_device, parent, false) //TODO: what if without parent.context?
         Log.d("DeviceAdapter", "OnCreateViewHolder called")
         return DeviceViewHolder(view)
     }
@@ -27,6 +28,8 @@ class DeviceAdapter(private val context: Context, private val deviceList: List<B
     @SuppressLint("MissingPermission")
     override fun onBindViewHolder(holder: DeviceViewHolder, position: Int) {
         val device = deviceList[position]
+
+
         holder.bind(device)
         Log.d("DeviceAdapter", "onBindViewHolder called")
         holder.itemView.setOnClickListener {
@@ -34,6 +37,19 @@ class DeviceAdapter(private val context: Context, private val deviceList: List<B
             // Connect to device
             //bluetoothConnectionHandler.connectOrBondSensor()
         }
+
+        // Hintergrundfarbe aktualisieren, basierend auf gerader oder ungerader Position in der Liste.
+        if (position % 2 == 0) {
+            holder.itemView.setBackgroundColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.lightgrey
+                )
+            )
+        } else {
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.white))
+        }
+
     }
 }
 
