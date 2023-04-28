@@ -37,12 +37,10 @@ class DataPresenter : AppCompatActivity()
 	override fun onNewIntent(dataPresenterIntent: Intent?)
 	{
 		super.onNewIntent(dataPresenterIntent)
-		tvData.text = "TESTEST"
 		dataPresenterIntent?.let { intent ->
 			val myString = intent.getStringExtra(KEY_TEMP_DATA).toString()
 			tvData.text = myString
-		}
-
+		} ?: Log.d(TAG, "intent is null!")
 	}
 
 

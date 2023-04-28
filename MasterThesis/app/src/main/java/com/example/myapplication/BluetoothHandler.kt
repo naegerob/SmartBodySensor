@@ -48,7 +48,7 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 			BluetoothDevice.BOND_BONDED ->
 			{
 				Log.d(TAG, "Already bonded. Connecting to ${btDevice.address}")
-				btDevice.connectGatt(context, false, this)
+				btDevice.connectGatt(context, true, this)
 			}
 			BluetoothDevice.BOND_NONE ->
 			{
@@ -89,8 +89,10 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 
 			dataPresenterIntent.run {
 				putExtra(KEY_TEMP_DATA, byteArray.toString())
+				Log.d(TAG, "onCharacteristicChanged datPresenterIntent $byteArray")
 				// several startActivity calls are handled in DataPresenter
-				dataPresenterIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+				dataPresenterIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP )
+
 				context.startActivity(dataPresenterIntent)
 			}
 
@@ -133,7 +135,7 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 	private fun startNewDataPresenter(targetDeviceAddress: String)
 	{
 		dataPresenterIntent.run {
-			flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+			flags = Intent.FLAG_ACTIVITY_NEW_TASK
 			putExtra(KEY_DEVICE_ADDRESS, targetDeviceAddress)
 			context.startActivity(dataPresenterIntent)
 		}
