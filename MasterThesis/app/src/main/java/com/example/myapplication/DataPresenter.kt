@@ -1,21 +1,30 @@
 package com.example.myapplication
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.SyncStateContract.Constants
 import android.util.Log
+import android.view.View
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
 import com.example.myapplication.Constants.KEY_TEMP_DATA
+import com.jjoe64.graphview.GraphView
+import com.jjoe64.graphview.series.DataPoint
+import com.jjoe64.graphview.series.LineGraphSeries
+
+
 
 class DataPresenter : AppCompatActivity()
 {
 	private lateinit var deviceMacAddress: String
 	private lateinit var tvData: TextView
 	private lateinit var tvMacAddress: TextView
+	private lateinit var graphView: GraphView
 	private var temperatureDifference: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
+	private var temperatureDifferencePrevious: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
 	private var batteryLevelState: ByteArray? = ByteArray(sizeBatteryLevel)
+	private var temperatureSeries: LineGraphSeries<DataPoint> = LineGraphSeries()
+
 
 	companion object {
 		const val TAG = "DataPresenter"
@@ -34,6 +43,11 @@ class DataPresenter : AppCompatActivity()
 		this.deviceMacAddress = intent.getStringExtra(KEY_DEVICE_ADDRESS).toString()
 
 		tvMacAddress.text = deviceMacAddress
+
+		graphView =  findViewById(R.id.idGraphView)
+
+
+
 		Log.d(TAG, "DataPresenter created: $deviceMacAddress")
 	}
 
@@ -48,6 +62,18 @@ class DataPresenter : AppCompatActivity()
 			tvData.text = byteArray.toString()
 			Log.d(TAG, byteArray.toString())
 		} ?: Log.d(TAG, "intent is null!")
+
+		// convert byte array into datapoints
+		temperatureDifferencePrevious = temperatureDifference
+		temperatureSeries.resetData(temperatureDifferencePrevious)
+		// shitty code
+		// TODO: check if temperaturedifference is null
+		for (i in temperatureDifference?.indices!!)
+		{
+			temperatureSeries.appendData(DataPoint(i.toDouble(), (temperatureDifference!![i] / 10).toDouble()), true, temperatureDifference!!.size )
+		}
+		graphView.addSeries(temperatureSeries)
+
 	}
 
 

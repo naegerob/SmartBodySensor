@@ -66,7 +66,9 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 	 * onCharacteristicRead is used for synchronous data exchange
 	 * onCharacteristicChanged is used for async data exchange
 	 */
-	override fun onCharacteristicRead(gatt: BluetoothGatt?,	characteristic: BluetoothGattCharacteristic, status: Int) {
+
+	@Deprecated("Deprecated in Java, but used for API 12 and lower")
+	override fun onCharacteristicRead(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic, status: Int) {
 		super.onCharacteristicRead(gatt, characteristic, status)
 		if (status == BluetoothGatt.GATT_SUCCESS) {
 			characteristic.let { char ->
@@ -81,6 +83,7 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 		}
 	}
 
+	@Deprecated("Deprecated in Java, but used for API 12 and lower")
 	override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
 		super.onCharacteristicChanged(gatt, characteristic)
 		if (characteristic.uuid == UUID_HEART_RATE_CHARACTERISTICS) {
@@ -89,7 +92,7 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 
 			dataPresenterIntent.run {
 				putExtra(KEY_TEMP_DATA, byteArray)
-				Log.d(TAG, "onCharacteristicChanged datPresenterIntent $byteArray")
+				Log.d(TAG, "onCharacteristicChanged dataPresenterIntent $byteArray")
 				// several startActivity calls are handled in DataPresenter
 				dataPresenterIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP )
 				context.startActivity(dataPresenterIntent)
@@ -150,8 +153,6 @@ class BluetoothScanHandler(private var deviceList: MutableList<BluetoothDevice>,
 	}
 	private val bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
 
-
-	private val bondedDevices = bluetoothAdapter?.bondedDevices
 	private val macAddressFilter: ScanFilter = ScanFilter.Builder()
 		.setDeviceName("Temp_Node") // Replace with your desired MAC address
 		.build()
@@ -209,6 +210,14 @@ class BluetoothScanHandler(private var deviceList: MutableList<BluetoothDevice>,
 			SCAN_FAILED_APPLICATION_REGISTRATION_FAILED -> Log.d(TAG, "Scan failed, application registration failed")
 			SCAN_FAILED_FEATURE_UNSUPPORTED -> Log.d(TAG, "Scan failed, feature unsupported")
 			SCAN_FAILED_INTERNAL_ERROR -> Log.d(TAG, "Scan failed, internal error")
+			SCAN_FAILED_OUT_OF_HARDWARE_RESOURCES ->
+			{
+				TODO()
+			}
+			SCAN_FAILED_SCANNING_TOO_FREQUENTLY ->
+			{
+				TODO()
+			}
 		}
 	}
 }
@@ -218,7 +227,6 @@ class BondStateReceiver : BroadcastReceiver() {
 	companion object {
 		private const val TAG = "BondStateReceiver"
 	}
-
 
 	override fun onReceive(context: Context?, intent: Intent?) {
 
