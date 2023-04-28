@@ -14,9 +14,13 @@ class DataPresenter : AppCompatActivity()
 	private lateinit var deviceMacAddress: String
 	private lateinit var tvData: TextView
 	private lateinit var tvMacAddress: TextView
+	private var temperatureDifference: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
+	private var batteryLevelState: ByteArray? = ByteArray(sizeBatteryLevel)
 
 	companion object {
 		const val TAG = "DataPresenter"
+		const val sizeTemperatureDifferenceArray = 12
+		const val sizeBatteryLevel = 2
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?)
@@ -38,8 +42,11 @@ class DataPresenter : AppCompatActivity()
 	{
 		super.onNewIntent(dataPresenterIntent)
 		dataPresenterIntent?.let { intent ->
-			val myString = intent.getStringExtra(KEY_TEMP_DATA).toString()
-			tvData.text = myString
+			val byteArray: ByteArray? = intent.getByteArrayExtra(KEY_TEMP_DATA)
+			batteryLevelState = byteArray?.copyOfRange(0, sizeBatteryLevel)
+			temperatureDifference = byteArray?.copyOfRange(sizeBatteryLevel, byteArray.size)
+			tvData.text = byteArray.toString()
+			Log.d(TAG, byteArray.toString())
 		} ?: Log.d(TAG, "intent is null!")
 	}
 
