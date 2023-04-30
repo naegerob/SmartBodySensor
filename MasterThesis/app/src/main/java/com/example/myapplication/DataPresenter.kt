@@ -22,6 +22,7 @@ class DataPresenter() : AppCompatActivity()
 	//private var temperatureDifferencePreviousArray: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
 	private var batteryLevelStateArray: ByteArray? = ByteArray(sizeBatteryLevel)
 	private var temperatureSeries: LineGraphSeries<DataPoint> = LineGraphSeries()
+	private var limitCounter: Int = 0
 	private var dataCounter: Int = 0
 	private var temperatureArrayList = ArrayList<DoubleArray>(numberOfDataArraysReceived)
 
@@ -68,21 +69,17 @@ class DataPresenter() : AppCompatActivity()
 		val temperatureDifferenceArrayDouble = temperatureDifferenceArray?.map { it.toDouble() }?.toDoubleArray()
 		val batteryLevelStateArrayDouble = batteryLevelStateArray?.map { it.toDouble() }?.toDoubleArray()
 
+		dataCounter++
 
-		if(dataCounter == numberOfDataArraysReceived)
+
+		if(limitCounter == numberOfDataArraysReceived)
 		{
 			temperatureArrayList.removeAt(0)
 		}
 		else {
-			dataCounter++
+			limitCounter++
 		}
 
-		graphView.viewport.scrollToEnd()
-
-		graphView.viewport.setMinX(0.0);
-		graphView.viewport.setMaxX(dataCounter * sizeTemperatureDifferenceArray.toDouble())
-		graphView.viewport.isXAxisBoundsManual = true
-		graphView.viewport.isScrollable = true
 
 		temperatureDifferenceArrayDouble?.let {
 			temperatureArrayList.add(it)
@@ -92,11 +89,19 @@ class DataPresenter() : AppCompatActivity()
 
 		// convert double[] to DataPoint[]
 		val currentTemperatureDifferencePoints = flattenedArray.let {
-			val dataPoints = Array(dataCounter * sizeTemperatureDifferenceArray) { i ->
+			val dataPoints = Array(limitCounter * sizeTemperatureDifferenceArray) { i ->
 				DataPoint(i.toDouble(), it[i]/10)
 			}
 			dataPoints
 		}
+
+
+		graphView.viewport.scrollToEnd()
+
+		graphView.viewport.setMinX(currentTemperatureDifferencePoints.size.toDouble() - limitCounter * sizeTemperatureDifferenceArray);
+		graphView.viewport.setMaxX(currentTemperatureDifferencePoints.size.toDouble())
+		graphView.viewport.isXAxisBoundsManual = true
+		graphView.viewport.isScrollable = true
 
 		val series = LineGraphSeries<DataPoint>(currentTemperatureDifferencePoints)
 
