@@ -87,11 +87,12 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 	override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
 		super.onCharacteristicChanged(gatt, characteristic)
 		if (characteristic.uuid == UUID_HEART_RATE_CHARACTERISTICS) {
-			val byteArray = characteristic.value
+			val byteArray: ByteArray? = characteristic.value
 			Log.d(TAG, "onCharacteristicChanged $byteArray")
 
 			dataPresenterIntent.run {
 				putExtra(KEY_TEMP_DATA, byteArray)
+
 				Log.d(TAG, "onCharacteristicChanged dataPresenterIntent $byteArray")
 				// several startActivity calls are handled in DataPresenter
 				dataPresenterIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP )

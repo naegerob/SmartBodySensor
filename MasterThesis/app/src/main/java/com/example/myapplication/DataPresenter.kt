@@ -3,7 +3,6 @@ package com.example.myapplication
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
@@ -13,23 +12,24 @@ import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 
 
-
-class DataPresenter : AppCompatActivity()
+class DataPresenter() : AppCompatActivity()
 {
 	private lateinit var deviceMacAddress: String
 	private lateinit var tvData: TextView
 	private lateinit var tvMacAddress: TextView
 	private lateinit var graphView: GraphView
-	private var temperatureDifference: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
-	private var temperatureDifferencePrevious: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
-	private var batteryLevelState: ByteArray? = ByteArray(sizeBatteryLevel)
+	private var temperatureDifferenceArray: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
+	//private var temperatureDifferencePreviousArray: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
+	private var batteryLevelStateArray: ByteArray? = ByteArray(sizeBatteryLevel)
 	private var temperatureSeries: LineGraphSeries<DataPoint> = LineGraphSeries()
-
+	private var dataCounter: Int = 0
+	private var temperatureArrayList = ArrayList<DoubleArray>(numberOfDataArraysReceived)
 
 	companion object {
 		const val TAG = "DataPresenter"
 		const val sizeTemperatureDifferenceArray = 12
 		const val sizeBatteryLevel = 2
+		const val numberOfDataArraysReceived = 5
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?)
@@ -46,38 +46,63 @@ class DataPresenter : AppCompatActivity()
 
 		graphView =  findViewById(R.id.idGraphView)
 
-
-
 		Log.d(TAG, "DataPresenter created: $deviceMacAddress")
 	}
 
-
+	/**
+	 * The plot should show 10 minutes of temperature difference
+	 * This equals to 6 received data plots
+	 */
 	override fun onNewIntent(dataPresenterIntent: Intent?)
 	{
 		super.onNewIntent(dataPresenterIntent)
 		dataPresenterIntent?.let { intent ->
-			val byteArray: ByteArray? = intent.getByteArrayExtra(KEY_TEMP_DATA)
-			batteryLevelState = byteArray?.copyOfRange(0, sizeBatteryLevel)
-			temperatureDifference = byteArray?.copyOfRange(sizeBatteryLevel, byteArray.size)
-			tvData.text = byteArray.toString()
-			Log.d(TAG, byteArray.toString())
+			val dataArray: ByteArray? = intent.getByteArrayExtra(KEY_TEMP_DATA)
+			batteryLevelStateArray = dataArray?.copyOfRange(0, sizeBatteryLevel)
+			temperatureDifferenceArray = dataArray?.copyOfRange(sizeBatteryLevel, dataArray.size)
+			tvData.text = dataArray.toString()
+			Log.d(TAG, dataArray.toString())
 		} ?: Log.d(TAG, "intent is null!")
 
-		// convert byte array into datapoints
-		temperatureDifferencePrevious = temperatureDifference
-		temperatureSeries.resetData(temperatureDifferencePrevious)
-		// shitty code
-		// TODO: check if temperaturedifference is null
-		for (i in temperatureDifference?.indices!!)
+		// convert to Double[]
+		val temperatureDifferenceArrayDouble = temperatureDifferenceArray?.map { it.toDouble() }?.toDoubleArray()
+		val batteryLevelStateArrayDouble = batteryLevelStateArray?.map { it.toDouble() }?.toDoubleArray()
+
+
+		if(dataCounter == numberOfDataArraysReceived)
 		{
-			temperatureSeries.appendData(DataPoint(i.toDouble(), (temperatureDifference!![i] / 10).toDouble()), true, temperatureDifference!!.size )
+			temperatureArrayList.removeAt(0)
 		}
-		graphView.addSeries(temperatureSeries)
+		else {
+			dataCounter++
+		}
 
+		graphView.viewport.scrollToEnd()
+
+		graphView.viewport.setMinX(0.0);
+		graphView.viewport.setMaxX(dataCounter * sizeTemperatureDifferenceArray.toDouble())
+		graphView.viewport.isXAxisBoundsManual = true
+		graphView.viewport.isScrollable = true
+
+		temperatureDifferenceArrayDouble?.let {
+			temperatureArrayList.add(it)
+		}
+		// FIXME: flattening does not work -> order is wrong
+		val flattenedArray = temperatureArrayList.flatMap { it.asIterable() }.toDoubleArray()
+
+		// convert double[] to DataPoint[]
+		val currentTemperatureDifferencePoints = flattenedArray.let {
+			val dataPoints = Array(dataCounter * sizeTemperatureDifferenceArray) { i ->
+				DataPoint(i.toDouble(), it[i]/10)
+			}
+			dataPoints
+		}
+
+		val series = LineGraphSeries<DataPoint>(currentTemperatureDifferencePoints)
+
+		//series.resetData(currentTemperatureDifferencePoints)
+		graphView.removeAllSeries()
+		graphView.addSeries(series)
+		Log.d(TAG, "At the end!")
 	}
-
-
-
 }
-
-
