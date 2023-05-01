@@ -32,6 +32,7 @@ class DataPresenter() : AppCompatActivity()
 		private const val secondsPerMinute = 60
 		private const val dataPointPerDelta = 10
 		const val dividerDataPointsToMinutes = secondsPerMinute / dataPointPerDelta
+		const val temperatureDifferenceTenth = 10
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?)
@@ -87,7 +88,7 @@ class DataPresenter() : AppCompatActivity()
 
 		// convert double[] to DataPoint[]
 		val currentTemperatureDifferencePoints = flattenedArray.mapIndexed { index, value ->
-			DataPoint(index.toDouble() / dividerDataPointsToMinutes, value / 10)
+			DataPoint(index.toDouble() / dividerDataPointsToMinutes, value / temperatureDifferenceTenth)
 		}.toTypedArray()
 		graphView.viewport.scrollToEnd()
 
