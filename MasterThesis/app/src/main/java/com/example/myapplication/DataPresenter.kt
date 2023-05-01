@@ -12,7 +12,7 @@ import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 
 
-class DataPresenter() : AppCompatActivity()
+class DataPresenter : AppCompatActivity()
 {
 	private lateinit var deviceMacAddress: String
 	private lateinit var tvData: TextView
@@ -93,12 +93,12 @@ class DataPresenter() : AppCompatActivity()
 		graphView.viewport.scrollToEnd()
 
 		// show the 60 most actual data points
-		graphView.viewport.setMinX(currentTemperatureDifferencePoints.size.toDouble() - limitDataPacketCounter * sizeTemperatureDifferenceArray);
+		graphView.viewport.setMinX(currentTemperatureDifferencePoints.size.toDouble() - limitDataPacketCounter * sizeTemperatureDifferenceArray)
 		graphView.viewport.setMaxX(currentTemperatureDifferencePoints.size.toDouble())
 		graphView.viewport.isXAxisBoundsManual = true
 		graphView.viewport.isScrollable = true
 
-		val series = LineGraphSeries<DataPoint>(currentTemperatureDifferencePoints)
+		val series = LineGraphSeries(currentTemperatureDifferencePoints)
 
 		graphView.removeAllSeries()
 		graphView.addSeries(series)
