@@ -49,8 +49,6 @@ Z
 *app/src/main/res/values-w1240dp/dimens.xml,a\0\a0ad08e8d3c264f872dc06b86e81ee2c65f22062
 h
 8app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml,6\e\6ec7d34b130497a10dc92abcde9b313d370a89df
-@
-app/build.gradle,f\4\f4a01d6a4fcb971362ec00a83903fd3902f52164
 >
 app/.gitignore,5\1\51e1c5d383dfaa35e0e7e5873a0a99355a86880f
 R

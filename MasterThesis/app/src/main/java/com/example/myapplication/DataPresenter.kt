@@ -19,11 +19,9 @@ class DataPresenter() : AppCompatActivity()
 	private lateinit var tvMacAddress: TextView
 	private lateinit var graphView: GraphView
 	private var temperatureDifferenceArray: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
-	//private var temperatureDifferencePreviousArray: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
 	private var batteryLevelStateArray: ByteArray? = ByteArray(sizeBatteryLevel)
-	private var temperatureSeries: LineGraphSeries<DataPoint> = LineGraphSeries()
-	private var limitCounter: Int = 0
-	private var dataCounter: Int = 0
+	private var limitDataPacketCounter: Int = 0 // datapacket counter up to 5 datapackets
+	private var dataPacketCounter: Int = 0 // datapacket counter endless
 	private var temperatureArrayList = ArrayList<DoubleArray>(numberOfDataArraysReceived)
 
 	companion object {
@@ -31,6 +29,9 @@ class DataPresenter() : AppCompatActivity()
 		const val sizeTemperatureDifferenceArray = 12
 		const val sizeBatteryLevel = 2
 		const val numberOfDataArraysReceived = 5
+		private const val secondsPerMinute = 60
+		private const val dataPointPerDelta = 10
+		const val dividerDataPointsToMinutes = secondsPerMinute / dataPointPerDelta
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?)
@@ -40,19 +41,18 @@ class DataPresenter() : AppCompatActivity()
 
 		this.tvData = findViewById(R.id.tvDummyText)
 		this.tvMacAddress = findViewById(R.id.tvMacAddress)
-
 		this.deviceMacAddress = intent.getStringExtra(KEY_DEVICE_ADDRESS).toString()
-
-		tvMacAddress.text = deviceMacAddress
-
-		graphView =  findViewById(R.id.idGraphView)
+		this.tvMacAddress.text = deviceMacAddress
+		this.graphView =  findViewById(R.id.idGraphView)
 
 		Log.d(TAG, "DataPresenter created: $deviceMacAddress")
 	}
 
 	/**
 	 * The plot should show 10 minutes of temperature difference
-	 * This equals to 6 received data plots
+	 * This equals to 6 received data packets
+	 * Also a conversion from byteArray to a LineGraphSeries with DataPoint is made
+	 * byteArray -> ArrayList<Double[]> -> Double[] -> DataPoints[] -> LineGraphSeries[DataPoint]
 	 */
 	override fun onNewIntent(dataPresenterIntent: Intent?)
 	{
@@ -69,43 +69,36 @@ class DataPresenter() : AppCompatActivity()
 		val temperatureDifferenceArrayDouble = temperatureDifferenceArray?.map { it.toDouble() }?.toDoubleArray()
 		val batteryLevelStateArrayDouble = batteryLevelStateArray?.map { it.toDouble() }?.toDoubleArray()
 
-		dataCounter++
+		dataPacketCounter++
 
-
-		if(limitCounter == numberOfDataArraysReceived)
+		// limit ArrayList to 60 entries
+		if(limitDataPacketCounter == numberOfDataArraysReceived)
 		{
 			temperatureArrayList.removeAt(0)
 		}
 		else {
-			limitCounter++
+			limitDataPacketCounter++
 		}
-
-
 		temperatureDifferenceArrayDouble?.let {
 			temperatureArrayList.add(it)
 		}
-		// FIXME: flattening does not work -> order is wrong
+
 		val flattenedArray = temperatureArrayList.flatMap { it.asIterable() }.toDoubleArray()
 
 		// convert double[] to DataPoint[]
-		val currentTemperatureDifferencePoints = flattenedArray.let {
-			val dataPoints = Array(limitCounter * sizeTemperatureDifferenceArray) { i ->
-				DataPoint(i.toDouble(), it[i]/10)
-			}
-			dataPoints
-		}
-
-
+		val currentTemperatureDifferencePoints = flattenedArray.mapIndexed { index, value ->
+			DataPoint(index.toDouble() / dividerDataPointsToMinutes, value / 10)
+		}.toTypedArray()
 		graphView.viewport.scrollToEnd()
 
-		graphView.viewport.setMinX(currentTemperatureDifferencePoints.size.toDouble() - limitCounter * sizeTemperatureDifferenceArray);
+		// show the 60 most actual data points
+		graphView.viewport.setMinX(currentTemperatureDifferencePoints.size.toDouble() - limitDataPacketCounter * sizeTemperatureDifferenceArray);
 		graphView.viewport.setMaxX(currentTemperatureDifferencePoints.size.toDouble())
 		graphView.viewport.isXAxisBoundsManual = true
 		graphView.viewport.isScrollable = true
 
 		val series = LineGraphSeries<DataPoint>(currentTemperatureDifferencePoints)
 
-		//series.resetData(currentTemperatureDifferencePoints)
 		graphView.removeAllSeries()
 		graphView.addSeries(series)
 		Log.d(TAG, "At the end!")
