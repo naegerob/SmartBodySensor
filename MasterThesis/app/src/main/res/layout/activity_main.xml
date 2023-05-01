@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
+    android:layout_margin="10dp"
     tools:context=".MainActivity">
 
     <TextView
@@ -12,24 +12,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="100dp"
+        android:layout_margin="20dp"
+        android:layout_marginTop="50dp"
         android:text="@string/here_are_device_names"
+        android:layout_alignParentTop="true"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textColor="#3F51B5"
-        android:textSize="21sp" />
+        android:textSize="20sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvDeviceList"
-        android:layout_width="317dp"
-        android:layout_height="168dp"
-        android:layout_alignTop="@id/tvDeviceInfo"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="75dp"
-        android:layout_marginTop="75dp"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_below="@id/tvDeviceInfo"
+        android:layout_margin="20dp"
         android:clickable="true"
         android:contextClickable="true"
         android:nestedScrollingEnabled="false"
@@ -41,9 +38,8 @@
         android:id="@+id/buttonScan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/rvDeviceList"
+        android:layout_below="@id/rvDeviceList"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="-81dp"
         android:onClick="btScan"
         android:text="@string/scan" />
 
@@ -51,9 +47,9 @@
         android:id="@+id/buttonConnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/rvDeviceList"
+        android:layout_margin="20dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="-154dp"
+        android:layout_below="@id/buttonScan"
         android:onClick="btConnectSensor"
         android:text="@string/connect_with_sensor" />
 </RelativeLayout>
