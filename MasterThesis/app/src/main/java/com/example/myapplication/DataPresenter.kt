@@ -44,7 +44,7 @@ class DataPresenter : AppCompatActivity()
 		this.tvMacAddress = findViewById(R.id.tvMacAddress)
 		this.deviceMacAddress = intent.getStringExtra(KEY_DEVICE_ADDRESS).toString()
 		this.tvMacAddress.text = deviceMacAddress
-		this.graphView =  findViewById(R.id.idGraphView)
+		this.graphView =  findViewById(R.id.GraphView)
 
 		Log.d(TAG, "DataPresenter created: $deviceMacAddress")
 	}
