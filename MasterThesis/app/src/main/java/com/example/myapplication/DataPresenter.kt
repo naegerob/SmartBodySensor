@@ -87,12 +87,23 @@ class DataPresenter : AppCompatActivity()
 		val flattenedArray = temperatureArrayList.flatMap { it.asIterable() }.toDoubleArray()
 
 		// convert double[] to DataPoint[]
+		/*
 		val currentTemperatureDifferencePoints = flattenedArray.mapIndexed { index, value ->
+
 			DataPoint(index.toDouble() / dividerDataPointsToMinutes, value / temperatureDifferenceTenth)
 		}.toTypedArray()
-		graphView.viewport.scrollToEnd()
+
+		*/
+		val currentTemperatureDifferencePoints = flattenedArray.let {
+			val dataPoints = Array(limitDataPacketCounter * sizeTemperatureDifferenceArray) { i ->
+				DataPoint(i.toDouble(), it[i] / temperatureDifferenceTenth)
+			}
+			dataPoints
+		}
+
 
 		// show the 60 most actual data points
+		graphView.viewport.scrollToEnd()
 		graphView.viewport.setMinX(currentTemperatureDifferencePoints.size.toDouble() - limitDataPacketCounter * sizeTemperatureDifferenceArray)
 		graphView.viewport.setMaxX(currentTemperatureDifferencePoints.size.toDouble())
 		graphView.viewport.isXAxisBoundsManual = true
