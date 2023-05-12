@@ -53,35 +53,35 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/GraphView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvDummyText">
 
         <ImageView
-            android:id="@+id/ivbatteryState"
+            android:id="@+id/ivBatteryState"
             android:layout_width="59dp"
             android:layout_height="48dp"
             android:layout_margin="10sp"
+            android:contentDescription="@string/battery_state"
             android:gravity="center"
-            app:srcCompat="@android:drawable/presence_online"
-            android:contentDescription="@string/battery_state" />
+            app:srcCompat="@drawable/ic_launcher_foreground"
+            tools:ignore="ImageContrastCheck" />
 
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/tvBatteryLevel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10sp"
-            android:textSize="15sp"
             android:gravity="center"
-            android:text="@string/textview" />
-
-
+            android:text="Battery Level"
+            android:textSize="18sp" />
     </LinearLayout>
 
     <com.jjoe64.graphview.GraphView
         android:id="@+id/GraphView"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="450dp"
         android:layout_margin="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
