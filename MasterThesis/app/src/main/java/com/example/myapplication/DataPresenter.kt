@@ -10,13 +10,22 @@ import com.example.myapplication.Constants.KEY_TEMP_DATA
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
+import kotlin.math.pow
 
+
+enum class BatteryStates (val value: UInt){
+	Normal(0U),
+	Battery_low(1U),
+	Battery_high(2U),
+	Reserve(3U)
+}
 
 class DataPresenter : AppCompatActivity()
 {
 	private lateinit var deviceMacAddress: String
 	private lateinit var tvData: TextView
 	private lateinit var tvMacAddress: TextView
+	private lateinit var tvBatteryLevel: TextView
 	private lateinit var graphView: GraphView
 	private var temperatureDifferenceArray: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
 	private var batteryLevelStateArray: ByteArray? = ByteArray(sizeBatteryLevel)
@@ -42,6 +51,7 @@ class DataPresenter : AppCompatActivity()
 
 		this.tvData = findViewById(R.id.tvDummyText)
 		this.tvMacAddress = findViewById(R.id.tvMacAddress)
+		this.tvBatteryLevel = findViewById(R.id.tvBatteryLevel)
 		this.deviceMacAddress = intent.getStringExtra(KEY_DEVICE_ADDRESS).toString()
 		this.tvMacAddress.text = deviceMacAddress
 		this.graphView =  findViewById(R.id.GraphView)
@@ -58,6 +68,7 @@ class DataPresenter : AppCompatActivity()
 	override fun onNewIntent(dataPresenterIntent: Intent?)
 	{
 		super.onNewIntent(dataPresenterIntent)
+
 		dataPresenterIntent?.let { intent ->
 			val dataArray: ByteArray? = intent.getByteArrayExtra(KEY_TEMP_DATA)
 			batteryLevelStateArray = dataArray?.copyOfRange(0, sizeBatteryLevel)
@@ -68,7 +79,27 @@ class DataPresenter : AppCompatActivity()
 
 		// convert to Double[]
 		val temperatureDifferenceArrayDouble = temperatureDifferenceArray?.map { it.toDouble() }?.toDoubleArray()
-		val batteryLevelStateArrayDouble = batteryLevelStateArray?.map { it.toDouble() }?.toDoubleArray()
+
+		// Parse battery state and voltage level
+		val batteryState: BatteryStates? = batteryLevelStateArray?.let {
+			(it[0].toUInt() and 0xC0U) shr 6
+		}?.toEnum<BatteryStates>()
+
+		val batteryVoltageLevelVolt = batteryLevelStateArray?.let {
+			val batteryVoltageLevelDigits = ((it[0].toUInt() and 0x3FU) or it[1].toUInt()).toUShort().and(0x3FFFU).toFloat()
+			val temp1 = batteryVoltageLevelDigits * 0.6
+			val temp2 = temp1 * 6
+			val temp3 = temp2 / 2F.pow(14)
+			temp3
+		}
+
+
+		tvBatteryLevel.text = batteryVoltageLevelVolt.toString()
+
+		Log.d(TAG, "Battery state: $batteryState")
+		Log.d(TAG, "Battery voltage: $batteryVoltageLevelVolt")
+
+
 
 		dataPacketCounter++
 
@@ -96,7 +127,7 @@ class DataPresenter : AppCompatActivity()
 		*/
 		val currentTemperatureDifferencePoints = flattenedArray.let {
 			val dataPoints = Array(limitDataPacketCounter * sizeTemperatureDifferenceArray) { i ->
-				DataPoint(i.toDouble(), it[i] / temperatureDifferenceTenth)
+				DataPoint(i.toDouble(), it[i] / temperatureDifferenceTenth/ dividerDataPointsToMinutes)
 			}
 			dataPoints
 		}
@@ -114,5 +145,10 @@ class DataPresenter : AppCompatActivity()
 		graphView.removeAllSeries()
 		graphView.addSeries(series)
 		Log.d(TAG, "At the end!")
+	}
+
+	//UInt to Enum
+	private inline fun <reified T : Enum<T>> UInt.toEnum(): T? {
+		return enumValues<T>().firstOrNull { it.ordinal.toUInt() == this }
 	}
 }
