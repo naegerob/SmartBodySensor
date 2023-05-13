@@ -3,6 +3,7 @@ package com.example.myapplication
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
@@ -26,6 +27,7 @@ class DataPresenter : AppCompatActivity()
 	private lateinit var tvData: TextView
 	private lateinit var tvMacAddress: TextView
 	private lateinit var tvBatteryLevel: TextView
+	private lateinit var ivBatteryState: ImageView
 	private lateinit var graphView: GraphView
 	private var temperatureDifferenceArray: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
 	private var batteryLevelStateArray: ByteArray? = ByteArray(sizeBatteryLevel)
@@ -52,6 +54,7 @@ class DataPresenter : AppCompatActivity()
 		this.tvData = findViewById(R.id.tvDummyText)
 		this.tvMacAddress = findViewById(R.id.tvMacAddress)
 		this.tvBatteryLevel = findViewById(R.id.tvBatteryLevel)
+		this.ivBatteryState = findViewById(R.id.ivBatteryState)
 		this.deviceMacAddress = intent.getStringExtra(KEY_DEVICE_ADDRESS).toString()
 		this.tvMacAddress.text = deviceMacAddress
 		this.graphView =  findViewById(R.id.GraphView)
@@ -93,8 +96,18 @@ class DataPresenter : AppCompatActivity()
 			temp3
 		}
 
-
+		// Update GUI
+		// Todo: Maybe insert in Coroutine!
 		tvBatteryLevel.text = batteryVoltageLevelVolt.toString()
+
+		if (batteryVoltageLevelVolt != null) {
+			if(batteryVoltageLevelVolt > 3.0F) {
+				ivBatteryState.setImageResource(R.drawable.battery_full)
+			} else {
+				ivBatteryState.setImageResource(R.drawable.battery_empty)
+			}
+		}
+
 
 		Log.d(TAG, "Battery state: $batteryState")
 		Log.d(TAG, "Battery voltage: $batteryVoltageLevelVolt")
