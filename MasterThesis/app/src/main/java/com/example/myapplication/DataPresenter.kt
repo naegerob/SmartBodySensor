@@ -12,6 +12,7 @@ import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
 import kotlin.math.pow
+import kotlin.system.measureTimeMillis
 
 
 enum class BatteryStates (val value: UInt){
@@ -80,38 +81,28 @@ class DataPresenter : AppCompatActivity()
 			Log.d(TAG, dataArray.toString())
 		} ?: Log.d(TAG, "intent is null!")
 
-		// convert to Double[]
-		val temperatureDifferenceArrayDouble = temperatureDifferenceArray?.map { it.toDouble() }?.toDoubleArray()
-
+		val batteryState: BatteryStates?
 		// Parse battery state and voltage level
-		val batteryState: BatteryStates? = batteryLevelStateArray?.let {
-			(it[0].toUInt() and 0xC0U) shr 6
-		}?.toEnum<BatteryStates>()
-
-		val batteryVoltageLevelVolt = batteryLevelStateArray?.let {
-			val batteryVoltageLevelDigits = ((it[0].toUInt() and 0x3FU) or it[1].toUInt()).toUShort().and(0x3FFFU).toFloat()
-			val temp1 = batteryVoltageLevelDigits * 0.6
-			val temp2 = temp1 * 6
-			val temp3 = temp2 / 2F.pow(14)
-			temp3
+		var measuredTimeInMs = measureTimeMillis {
+			batteryState = batteryLevelStateArray?.let {
+				(it[0].toUInt() and 0xC0U) shr 6
+			}?.toEnum<BatteryStates>()
 		}
 
-		// Update GUI
-		// Todo: Maybe insert in Coroutine!
-		tvBatteryLevel.text = batteryVoltageLevelVolt.toString()
-
-		if (batteryVoltageLevelVolt != null) {
-			if(batteryVoltageLevelVolt > 3.0F) {
-				ivBatteryState.setImageResource(R.drawable.battery_full)
-			} else {
-				ivBatteryState.setImageResource(R.drawable.battery_empty)
+		val batteryVoltageLevelVolt: Double?
+		measuredTimeInMs = measureTimeMillis {
+				batteryVoltageLevelVolt = batteryLevelStateArray?.let {
+				val batteryVoltageLevelDigits = ((it[0].toUInt() and 0x3FU) or it[1].toUInt()).toUShort().and(0x3FFFU).toFloat()
+				val temp1 = batteryVoltageLevelDigits * 0.6
+				val temp2 = temp1 * 6
+				val temp3 = temp2 / 2F.pow(14)
+				temp3
 			}
 		}
 
 
 		Log.d(TAG, "Battery state: $batteryState")
 		Log.d(TAG, "Battery voltage: $batteryVoltageLevelVolt")
-
 
 
 		dataPacketCounter++
@@ -124,40 +115,57 @@ class DataPresenter : AppCompatActivity()
 		else {
 			limitDataPacketCounter++
 		}
-		temperatureDifferenceArrayDouble?.let {
-			temperatureArrayList.add(it)
-		}
 
-		val flattenedArray = temperatureArrayList.flatMap { it.asIterable() }.toDoubleArray()
+		val currentTemperatureDifferencePoints = convertArrayToDataPoints()
 
-		// convert double[] to DataPoint[]
-		/*
-		val currentTemperatureDifferencePoints = flattenedArray.mapIndexed { index, value ->
+		// Update GUI
+		// Todo: Insert in coroutine!
+		updateBattery(batteryVoltageLevelVolt)
+		updateGraph(currentTemperatureDifferencePoints)
 
-			DataPoint(index.toDouble() / dividerDataPointsToMinutes, value / temperatureDifferenceTenth)
-		}.toTypedArray()
+		Log.d(TAG, "At the end!")
+	}
 
-		*/
-		val currentTemperatureDifferencePoints = flattenedArray.let {
-			val dataPoints = Array(limitDataPacketCounter * sizeTemperatureDifferenceArray) { i ->
-				DataPoint(i.toDouble(), it[i] / temperatureDifferenceTenth/ dividerDataPointsToMinutes)
+	private fun updateBattery(batteryVoltageLevelVolt: Double?) {
+		tvBatteryLevel.text = batteryVoltageLevelVolt.toString()
+
+		if (batteryVoltageLevelVolt != null) {
+			if(batteryVoltageLevelVolt > 3.0F) {
+				ivBatteryState.setImageResource(R.drawable.battery_full)
+			} else {
+				ivBatteryState.setImageResource(R.drawable.battery_empty)
 			}
-			dataPoints
 		}
 
+	}
 
+	private fun updateGraph(currentTemperatureDifferencePoints: Array<DataPoint>) {
 		// show the 60 most actual data points
 		graphView.viewport.scrollToEnd()
 		graphView.viewport.setMinX(currentTemperatureDifferencePoints.size.toDouble() - limitDataPacketCounter * sizeTemperatureDifferenceArray)
 		graphView.viewport.setMaxX(currentTemperatureDifferencePoints.size.toDouble())
 		graphView.viewport.isXAxisBoundsManual = true
 		graphView.viewport.isScrollable = true
-
 		val series = LineGraphSeries(currentTemperatureDifferencePoints)
-
 		graphView.removeAllSeries()
 		graphView.addSeries(series)
-		Log.d(TAG, "At the end!")
+	}
+
+	private fun convertArrayToDataPoints() :Array<DataPoint>{
+		// convert to Double[]
+		val temperatureDifferenceArrayDouble = temperatureDifferenceArray?.map { it.toDouble() }?.toDoubleArray()
+
+		temperatureDifferenceArrayDouble?.let {
+			temperatureArrayList.add(it)
+		}
+
+		val flattenedArray = temperatureArrayList.flatMap { it.asIterable() }.toDoubleArray()
+		return flattenedArray.let {
+			val dataPoints = Array(limitDataPacketCounter * sizeTemperatureDifferenceArray) { i ->
+				DataPoint(i.toDouble(), it[i] / (temperatureDifferenceTenth * dividerDataPointsToMinutes))
+			}
+			dataPoints
+		}
 	}
 
 	//UInt to Enum
