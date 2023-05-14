@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Intent
@@ -9,12 +10,16 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
@@ -22,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: DeviceAdapter
     private val deviceList = mutableListOf<BluetoothDevice>()
     private lateinit var recyclerView: RecyclerView
+    private lateinit var progessDialog: Dialog
 
     // Bluetooth Handlers
     private lateinit var bleScanHandler: BluetoothScanHandler
@@ -88,10 +94,25 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
     @SuppressLint("MissingPermission")
     fun btConnectSensor(view: View) {
         printInfo("Connect to Sensor")
+        CoroutineScope(Dispatchers.Main).launch {
+            showProgressDialog()
+        }
         bluetoothConnectionHandler.connectOrBondSensor()
+    }
+
+    private fun showProgressDialog()
+    {
+        progessDialog = Dialog(this)
+        progessDialog.setContentView(R.layout.dialog_progress)
+        progessDialog.show()
+    }
+    private fun cancelProgressDialog()
+    {
+        progessDialog.cancel()
     }
 
 }

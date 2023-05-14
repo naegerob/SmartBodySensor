@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +15,7 @@ import com.jjoe64.graphview.series.LineGraphSeries
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 import kotlin.math.pow
 import kotlin.system.measureTimeMillis
 
@@ -28,7 +30,6 @@ enum class BatteryStates (val value: UInt){
 class DataPresenter : AppCompatActivity()
 {
 	private lateinit var deviceMacAddress: String
-	private lateinit var tvData: TextView
 	private lateinit var tvMacAddress: TextView
 	private lateinit var tvBatteryLevel: TextView
 	private lateinit var ivBatteryState: ImageView
@@ -61,7 +62,6 @@ class DataPresenter : AppCompatActivity()
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_data_presenter)
 
-		this.tvData = findViewById(R.id.tvDummyText)
 		this.tvMacAddress = findViewById(R.id.tvMacAddress)
 		this.tvBatteryLevel = findViewById(R.id.tvBatteryLevel)
 		this.ivBatteryState = findViewById(R.id.ivBatteryState)
@@ -86,10 +86,8 @@ class DataPresenter : AppCompatActivity()
 			val dataArray: ByteArray? = intent.getByteArrayExtra(KEY_TEMP_DATA)
 			batteryLevelStateArray = dataArray?.copyOfRange(0, sizeBatteryLevel)
 			temperatureDifferenceArray = dataArray?.copyOfRange(sizeBatteryLevel, dataArray.size)
-			tvData.text = dataArray.toString()
 			Log.d(TAG, dataArray.toString())
 		} ?: Log.d(TAG, "intent is null!")
-
 
 		val (batteryState, batteryVoltageLevelVolt) = readBatteryStateAndVoltageLevel()
 
@@ -139,7 +137,8 @@ class DataPresenter : AppCompatActivity()
 	}
 
 	private fun updateBattery(batteryVoltageLevelVolt: Double?) {
-		tvBatteryLevel.text = batteryVoltageLevelVolt.toString()
+		val df = DecimalFormat("#.##")
+		tvBatteryLevel.text = df.format(batteryVoltageLevelVolt).toString() + 'V'
 
 		if (batteryVoltageLevelVolt != null) {
 			if(batteryVoltageLevelVolt > 3.0F) {
@@ -155,7 +154,7 @@ class DataPresenter : AppCompatActivity()
 		// show the 60 most actual data points
 		graphView.viewport.scrollToEnd()
 		graphView.viewport.setMinX(currentTemperatureDifferencePoints.size.toDouble() - limitDataPacketCounter * sizeTemperatureDifferenceArray)
-		graphView.viewport.setMaxX(currentTemperatureDifferencePoints.size.toDouble())
+		graphView.viewport.setMaxX(currentTemperatureDifferencePoints.size.toDouble() / dividerDataPointsToMinutes)
 		graphView.viewport.isXAxisBoundsManual = true
 		graphView.viewport.isScrollable = true
 		val series = LineGraphSeries(currentTemperatureDifferencePoints)
@@ -174,7 +173,7 @@ class DataPresenter : AppCompatActivity()
 		val flattenedArray = temperatureArrayList.flatMap { it.asIterable() }.toDoubleArray()
 		return flattenedArray.let {
 			val dataPoints = Array(limitDataPacketCounter * sizeTemperatureDifferenceArray) { i ->
-				DataPoint(i.toDouble(), it[i] / (temperatureDifferenceTenth * dividerDataPointsToMinutes))
+				DataPoint(i.toDouble() / dividerDataPointsToMinutes, it[i] / temperatureDifferenceTenth)
 			}
 			dataPoints
 		}

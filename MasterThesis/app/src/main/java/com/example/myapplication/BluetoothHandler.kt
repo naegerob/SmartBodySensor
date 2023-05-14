@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.bluetooth.*
 import android.bluetooth.BluetoothClass.Device
 import android.bluetooth.le.ScanCallback
@@ -107,6 +108,7 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 			Log.d(TAG, "${gatt.device.address} connected")
 			gatt.discoverServices()
 			startNewDataPresenter(gatt.device.address)
+
 		} else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
 			Log.d(TAG, "${gatt.device.address} disconnected")
 			gatt.close()
