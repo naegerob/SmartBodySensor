@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "MasterThesis"
 include ':app'
+include ':benchmark'

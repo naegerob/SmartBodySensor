@@ -11,6 +11,9 @@ import com.example.myapplication.Constants.KEY_TEMP_DATA
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.math.pow
 import kotlin.system.measureTimeMillis
 
@@ -45,6 +48,12 @@ class DataPresenter : AppCompatActivity()
 		private const val dataPointPerDelta = 10
 		const val dividerDataPointsToMinutes = secondsPerMinute / dataPointPerDelta
 		const val temperatureDifferenceTenth = 10
+		const val adcReference = 0.6
+		const val adcGain = 6
+		const val adcResolutionBits = 14
+		const val maskBits0To5 = 0x3FU
+		const val maskBits0To13: UShort = 0x3FFFU
+		const val maskBits6To7 = 0xC0U
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?)
@@ -81,32 +90,31 @@ class DataPresenter : AppCompatActivity()
 			Log.d(TAG, dataArray.toString())
 		} ?: Log.d(TAG, "intent is null!")
 
-		val batteryState: BatteryStates?
-		// Parse battery state and voltage level
-		var measuredTimeInMs = measureTimeMillis {
-			batteryState = batteryLevelStateArray?.let {
-				(it[0].toUInt() and 0xC0U) shr 6
-			}?.toEnum<BatteryStates>()
-		}
 
-		val batteryVoltageLevelVolt: Double?
-		measuredTimeInMs = measureTimeMillis {
-				batteryVoltageLevelVolt = batteryLevelStateArray?.let {
-				val batteryVoltageLevelDigits = ((it[0].toUInt() and 0x3FU) or it[1].toUInt()).toUShort().and(0x3FFFU).toFloat()
-				val temp1 = batteryVoltageLevelDigits * 0.6
-				val temp2 = temp1 * 6
-				val temp3 = temp2 / 2F.pow(14)
-				temp3
-			}
-		}
-
+		val (batteryState, batteryVoltageLevelVolt) = readBatteryStateAndVoltageLevel()
 
 		Log.d(TAG, "Battery state: $batteryState")
 		Log.d(TAG, "Battery voltage: $batteryVoltageLevelVolt")
 
+		// limit dataPointts for the graph
+		limitNumberData()
 
+		val currentTemperatureDifferencePoints = convertArrayToDataPoints()
+		// Update GUI
+		CoroutineScope(Dispatchers.Main).launch {
+			updateBattery(batteryVoltageLevelVolt)
+		}
+		CoroutineScope(Dispatchers.Main).launch {
+			updateGraph(currentTemperatureDifferencePoints)
+		}
+
+
+		Log.d(TAG, "At the end!")
+	}
+
+	private fun limitNumberData()
+	{
 		dataPacketCounter++
-
 		// limit ArrayList to 60 entries
 		if(limitDataPacketCounter == numberOfDataArraysReceived)
 		{
@@ -115,15 +123,19 @@ class DataPresenter : AppCompatActivity()
 		else {
 			limitDataPacketCounter++
 		}
+	}
 
-		val currentTemperatureDifferencePoints = convertArrayToDataPoints()
-
-		// Update GUI
-		// Todo: Insert in coroutine!
-		updateBattery(batteryVoltageLevelVolt)
-		updateGraph(currentTemperatureDifferencePoints)
-
-		Log.d(TAG, "At the end!")
+	private fun readBatteryStateAndVoltageLevel(): Pair<BatteryStates?, Double?>
+	{
+		val batteryState = batteryLevelStateArray?.let {
+			(it[0].toUInt() and maskBits6To7) shr 6
+		}?.toEnum<BatteryStates>()
+		val batteryVoltageLevelVolt = batteryLevelStateArray?.let {
+			val batteryVoltageLevelDigits = ((it[0].toUInt() and maskBits0To5) or it[1].toUInt()).toUShort().and(maskBits0To13).toFloat()
+			val batteryLevel = batteryVoltageLevelDigits * adcReference * adcGain / 2F.pow(adcResolutionBits)
+			batteryLevel
+		}
+		return Pair(batteryState, batteryVoltageLevelVolt)
 	}
 
 	private fun updateBattery(batteryVoltageLevelVolt: Double?) {
