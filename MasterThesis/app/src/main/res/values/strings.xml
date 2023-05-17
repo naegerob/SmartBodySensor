@@ -20,4 +20,8 @@
     <string name="macaddress">MacAddress</string>
     <string name="textview">Battery level</string>
     <string name="battery_state">N/A</string>
+    <string name="battery_level">Battery Level</string>
+    <string name="voltage">V</string>
+    <string name="connect_to_device">Connect to Device</string>
+    <string name="temperature_difference_k_vs_time_min">Temperature difference [K] vs. time [min]</string>
 </resources>
