@@ -15,7 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.pow
-import kotlin.system.measureTimeMillis
 
 
 enum class BatteryStates (val value: UInt){
@@ -34,10 +33,12 @@ class DataPresenter : AppCompatActivity()
 	private lateinit var ivBatteryState: ImageView
 	private lateinit var graphView: GraphView
 	private var temperatureDifferenceArray: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
+	private var temperatureDifferenceArrayDouble: DoubleArray? = DoubleArray(sizeTemperatureDifferenceArray)
 	private var batteryLevelStateArray: ByteArray? = ByteArray(sizeBatteryLevel)
 	private var limitDataPacketCounter: Int = 0 // datapacket counter up to 5 datapackets
 	private var dataPacketCounter: Int = 0 // datapacket counter endless
 	private var temperatureArrayList = ArrayList<DoubleArray>(numberOfDataArraysReceived)
+	private var jsonEntryList = ArrayList<JsonEntry>()
 
 	companion object {
 		const val TAG = "DataPresenter"
@@ -96,8 +97,8 @@ class DataPresenter : AppCompatActivity()
 		Log.d(TAG, "Battery state: $batteryState")
 		Log.d(TAG, "Battery voltage: $batteryVoltageLevelVolt")
 
-		// limit dataPointts for the graph
-		limitNumberData()
+		// limit dataPoints for the graph
+		limitNumberDataAndIncreaseCounter()
 
 		val currentTemperatureDifferencePoints = convertArrayToDataPoints()
 		// Update GUI
@@ -108,11 +109,21 @@ class DataPresenter : AppCompatActivity()
 			updateGraph(currentTemperatureDifferencePoints)
 		}
 
+		convertJson(batteryVoltageLevelVolt)
 
 		Log.d(TAG, "At the end!")
 	}
 
-	private fun limitNumberData()
+	private fun convertJson(batteryVoltageLevelVolt: Double?)
+	{
+		for (i in 0 until sizeTemperatureDifferenceArray)
+		{
+			val jsonEntry = JsonEntry(sizeTemperatureDifferenceArray * (dataPacketCounter - 1)+ i, temperatureDifferenceArrayDouble?.get(i), batteryVoltageLevelVolt)
+			jsonEntryList.add(jsonEntry)
+		}
+	}
+
+	private fun limitNumberDataAndIncreaseCounter()
 	{
 		dataPacketCounter++
 		// limit ArrayList to 60 entries
@@ -154,8 +165,9 @@ class DataPresenter : AppCompatActivity()
 	private fun updateGraph(currentTemperatureDifferencePoints: Array<DataPoint>) {
 		// show the 60 most actual data points
 		graphView.viewport.scrollToEnd()
-		graphView.viewport.setMinX(currentTemperatureDifferencePoints.size.toDouble() - limitDataPacketCounter * sizeTemperatureDifferenceArray)
-		graphView.viewport.setMaxX(currentTemperatureDifferencePoints.size.toDouble())
+		graphView.viewport.setMinX((currentTemperatureDifferencePoints.size.toDouble() -
+				limitDataPacketCounter * sizeTemperatureDifferenceArray) * dataPacketCounter)
+		graphView.viewport.setMaxX(currentTemperatureDifferencePoints.size.toDouble() * dataPacketCounter)
 		graphView.viewport.isXAxisBoundsManual = true
 		graphView.viewport.isScrollable = true
 		val series = LineGraphSeries(currentTemperatureDifferencePoints)
@@ -165,7 +177,7 @@ class DataPresenter : AppCompatActivity()
 
 	private fun convertArrayToDataPoints() :Array<DataPoint>{
 		// convert to Double[]
-		val temperatureDifferenceArrayDouble = temperatureDifferenceArray?.map { it.toDouble() }?.toDoubleArray()
+		temperatureDifferenceArrayDouble = temperatureDifferenceArray?.map { it.toDouble() }?.toDoubleArray()
 
 		temperatureDifferenceArrayDouble?.let {
 			temperatureArrayList.add(it)

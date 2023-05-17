@@ -57,3 +57,5 @@ h
 8app/src/main/java/com/example/myapplication/Constants.kt,7\e\7e4d0b54b8202c7f30b0c70e65fe92b4c34a57d7
 o
 ?app/src/main/java/com/example/myapplication/BluetoothHandler.kt,1\a\1abc8e668bedbcc8e1f5edc5d52613976e2cfae3
+x
+Hbenchmark/src/main/java/com/example/benchmark/ExampleStartupBenchmark.kt,c\5\c5390b20cda05512e023cf151bf4af3bdfed13b7
