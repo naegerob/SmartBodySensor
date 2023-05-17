@@ -117,7 +117,8 @@ class DataPresenter : AppCompatActivity()
 	{
 		for (i in 0 until sizeTemperatureDifferenceArray)
 		{
-			val jsonEntry = JsonEntry(sizeTemperatureDifferenceArray * (dataPacketCounter - 1)+ i, temperatureDifferenceArrayDouble?.get(i), batteryVoltageLevelVolt)
+			val jsonEntry = JsonEntry(sizeTemperatureDifferenceArray * (dataPacketCounter - 1)+ i,
+				temperatureDifferenceArrayDouble?.get(i), batteryVoltageLevelVolt)
 			jsonEntryList.add(jsonEntry)
 		}
 	}
@@ -165,14 +166,16 @@ class DataPresenter : AppCompatActivity()
 	private fun updateGraph(currentTemperatureDifferencePoints: Array<DataPoint>) {
 		// show the 60 most actual data points
 		graphView.viewport.scrollToEnd()
-<<<<<<< HEAD
+
 		graphView.viewport.setMinX((currentTemperatureDifferencePoints.size.toDouble() -
 				limitDataPacketCounter * sizeTemperatureDifferenceArray) * dataPacketCounter)
 		graphView.viewport.setMaxX(currentTemperatureDifferencePoints.size.toDouble() * dataPacketCounter)
-=======
-		graphView.viewport.setMinX(currentTemperatureDifferencePoints.size.toDouble() - limitDataPacketCounter * sizeTemperatureDifferenceArray)
-		graphView.viewport.setMaxX(currentTemperatureDifferencePoints.size.toDouble() / dividerDataPointsToMinutes)
->>>>>>> fc16b0b837b7f164d072010207b07053057786ee
+
+		graphView.viewport.setMinX((currentTemperatureDifferencePoints.size.toDouble()
+				- limitDataPacketCounter * sizeTemperatureDifferenceArray) * dataPacketCounter)
+		graphView.viewport.setMaxX(currentTemperatureDifferencePoints.size.toDouble()
+				/ dividerDataPointsToMinutes * dataPacketCounter)
+
 		graphView.viewport.isXAxisBoundsManual = true
 		graphView.viewport.isScrollable = true
 		val series = LineGraphSeries(currentTemperatureDifferencePoints)
