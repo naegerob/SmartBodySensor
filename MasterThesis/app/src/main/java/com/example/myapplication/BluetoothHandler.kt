@@ -27,6 +27,7 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 	private val bondStateReceiver = BondStateReceiver()
 	private val bondFilter = IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
 	private val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+	private lateinit var gattHandler: BluetoothGatt
 
 	companion object {
 		private const val TAG = "BluetoothHandler"
@@ -40,6 +41,7 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 		Log.d(TAG, "Creating BluetoothConnectionHandler")
 		context.registerReceiver(bondStateReceiver, bondFilter)
 	}
+
 
 	fun connectOrBondSensor()
 	{
@@ -106,6 +108,7 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 		super.onConnectionStateChange(gatt, status, newState)
 		if (newState == BluetoothProfile.STATE_CONNECTED) {
 			Log.d(TAG, "${gatt.device.address} connected")
+			gattHandler = gatt
 			gatt.discoverServices()
 			startNewDataPresenter(gatt.device.address)
 
@@ -135,6 +138,11 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 			Log.e(TAG, "${gatt.device.address} service discovery failed")
 			gatt.disconnect()
 		}
+	}
+
+	fun disconnect()
+	{
+		gattHandler.disconnect()
 	}
 
 	private fun startNewDataPresenter(targetDeviceAddress: String)
@@ -215,11 +223,9 @@ class BluetoothScanHandler(private var deviceList: MutableList<BluetoothDevice>,
 			SCAN_FAILED_INTERNAL_ERROR -> Log.d(TAG, "Scan failed, internal error")
 			SCAN_FAILED_OUT_OF_HARDWARE_RESOURCES ->
 			{
-				TODO()
 			}
 			SCAN_FAILED_SCANNING_TOO_FREQUENTLY ->
 			{
-				TODO()
 			}
 		}
 	}

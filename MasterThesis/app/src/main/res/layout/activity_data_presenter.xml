@@ -11,10 +11,10 @@
         android:id="@+id/tvInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/connected_with"
+        android:layout_margin="10dp"
         android:gravity="center"
+        android:text="@string/connected_with"
         android:textSize="20sp"
-        android:layout_margin="10sp"
         app:layout_constraintBottom_toTopOf="@id/tvMacAddress"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -24,69 +24,92 @@
         android:id="@+id/tvMacAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:gravity="center"
         android:text="@string/macaddress"
         android:textSize="18sp"
-        android:gravity="center"
-        android:layout_margin="5sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvInfo"/>
+        app:layout_constraintTop_toBottomOf="@id/tvInfo" />
 
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="2sp"
+        android:layout_margin="10dp"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/tvGraphInfo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvMacAddress"
-        >
+        app:layout_constraintTop_toBottomOf="@+id/tvMacAddress">
+
+        <TextView
+            android:id="@+id/tvCurrentPower"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="center"
+            android:text="@string/power"
+            android:textSize="18sp" />
 
         <ImageView
             android:id="@+id/ivBatteryState"
             android:layout_width="59dp"
             android:layout_height="48dp"
-            android:layout_margin="10sp"
+
+            android:layout_marginStart="50dp"
             android:contentDescription="@string/battery_state"
             android:gravity="center"
             app:srcCompat="@drawable/ic_launcher_foreground"
             tools:ignore="ImageContrastCheck" />
 
-
         <TextView
             android:id="@+id/tvBatteryLevel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10sp"
+            android:layout_margin="10dp"
             android:gravity="center"
             android:text="@string/battery_level"
             android:textSize="18sp" />
+
     </LinearLayout>
 
     <TextView
         android:id="@+id/tvGraphInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="5sp"
+        android:layout_margin="5dp"
         android:gravity="center"
         android:text="@string/temperature_difference_k_vs_time_min"
         android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@+id/GraphView"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
     <com.jjoe64.graphview.GraphView
         android:id="@+id/GraphView"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:layout_margin="10sp"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/buttonStop"
         app:layout_constraintTop_toBottomOf="@+id/tvGraphInfo" />
+
+    <Button
+        android:id="@+id/buttonStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/stop"
+        android:onClick="btStop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/GraphView" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

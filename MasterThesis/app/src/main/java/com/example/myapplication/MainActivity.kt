@@ -10,7 +10,6 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -27,7 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: DeviceAdapter
     private val deviceList = mutableListOf<BluetoothDevice>()
     private lateinit var recyclerView: RecyclerView
-    private lateinit var progessDialog: Dialog
+    private lateinit var progressDialog: Dialog
 
     // Bluetooth Handlers
     private lateinit var bleScanHandler: BluetoothScanHandler
@@ -94,7 +93,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     @SuppressLint("MissingPermission")
     fun btConnectSensor(view: View) {
         printInfo("Connect to Sensor")
@@ -106,13 +104,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun showProgressDialog()
     {
-        progessDialog = Dialog(this)
-        progessDialog.setContentView(R.layout.dialog_progress)
-        progessDialog.show()
-    }
-    private fun cancelProgressDialog()
-    {
-        progessDialog.cancel()
+        progressDialog = Dialog(this)
+        progressDialog.setContentView(R.layout.dialog_progress)
+        progressDialog.show()
     }
 
 }
