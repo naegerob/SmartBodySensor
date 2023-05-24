@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myapplication.Constants.KEY_BLUETOOTHHANDLER
 import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
 import com.example.myapplication.Constants.KEY_TEMP_DATA
 import com.jjoe64.graphview.GraphView
@@ -72,7 +73,8 @@ class DataPresenter : AppCompatActivity()
 		this.deviceMacAddress = intent.getStringExtra(KEY_DEVICE_ADDRESS).toString()
 		this.tvMacAddress.text = deviceMacAddress
 		this.graphView =  findViewById(R.id.GraphView)
-		bluetoothConnectionHandler = BluetoothConnectionHandler(this)
+		bluetoothConnectionHandler = BluetoothConnectionManager.connectionHandler
+
 		Log.d(TAG, "DataPresenter created: $deviceMacAddress")
 	}
 
@@ -104,7 +106,10 @@ class DataPresenter : AppCompatActivity()
 		val currentTemperatureDifferencePoints = convertArrayToDataPoints()
 		// Update GUI
 		CoroutineScope(Dispatchers.Main).launch {
-			updateBattery(batteryVoltageLevelVolt)
+			if (batteryVoltageLevelVolt != null)
+			{
+				updateBattery(batteryVoltageLevelVolt)
+			}
 		}
 		CoroutineScope(Dispatchers.Main).launch {
 			updateGraph(currentTemperatureDifferencePoints)
@@ -154,7 +159,6 @@ class DataPresenter : AppCompatActivity()
 	private fun updateBattery(batteryVoltageLevelVolt: Double?) {
 		val df = DecimalFormat("#.##")
 		tvBatteryLevel.text = df.format(batteryVoltageLevelVolt).toString() + 'V'
-
 		if (batteryVoltageLevelVolt != null) {
 			if(batteryVoltageLevelVolt > 3.0F) {
 				ivBatteryState.setImageResource(R.drawable.battery_full)
@@ -162,10 +166,9 @@ class DataPresenter : AppCompatActivity()
 				ivBatteryState.setImageResource(R.drawable.battery_empty)
 
 			}
+
 		}
-
 	}
-
 	private fun updateGraph(currentTemperatureDifferencePoints: Array<DataPoint>) {
 		// show the 60 most actual data points
 		graphView.viewport.scrollToEnd()
@@ -205,5 +208,7 @@ class DataPresenter : AppCompatActivity()
 	@SuppressLint("MissingPermission")
 	fun btStop(view: View) {
 		bluetoothConnectionHandler.disconnect()
+		val intent = Intent(this, MainActivity::class.java)
+		startActivity(intent)
 	}
 }

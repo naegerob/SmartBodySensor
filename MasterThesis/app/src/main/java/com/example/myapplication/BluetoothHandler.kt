@@ -14,11 +14,16 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Handler
 import android.util.Log
+import com.example.myapplication.Constants.KEY_BLUETOOTHHANDLER
 import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
 import com.example.myapplication.Constants.KEY_TEMP_DATA
 import java.util.UUID
 
-private const val SCAN_DURATION_MS = 5000L
+
+object BluetoothConnectionManager {
+	@SuppressLint("StaticFieldLeak")
+	lateinit var connectionHandler: BluetoothConnectionHandler
+}
 
 @SuppressLint("MissingPermission")
 class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCallback() {

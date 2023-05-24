@@ -42,17 +42,19 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        recyclerView = findViewById<RecyclerView>(R.id.rvDeviceList)
+        recyclerView = findViewById(R.id.rvDeviceList)
         adapter = DeviceAdapter(this, deviceList)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+        bluetoothConnectionHandler = BluetoothConnectionHandler(this)
+        BluetoothConnectionManager.connectionHandler = bluetoothConnectionHandler
 
         bleScanHandler = BluetoothScanHandler(deviceList, adapter)
-        bluetoothConnectionHandler = BluetoothConnectionHandler(this)
+
         printInfo("Enable GPS!")
         // Check for BLE
         configBLE()
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         Log.d("MainActivity", "onCreate called")
     }
 
