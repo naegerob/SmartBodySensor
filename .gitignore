@@ -1,0 +1,16 @@
+*.iml
+.gradle
+/MasterThesis/local.properties
+/MasterThesis/.idea/caches
+/MasterThesis/.idea/libraries
+/MasterThesis/.idea/modules.xml
+/MasterThesis/.idea/workspace.xml
+/MasterThesis/.idea/navEditor.xml
+/MasterThesis/.idea/assetWizardSettings.xml
+/MasterThesis/.idea/sonarlint
+.DS_Store
+/MasterThesis/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
