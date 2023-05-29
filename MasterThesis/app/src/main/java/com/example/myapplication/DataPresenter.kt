@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myapplication.Constants.KEY_BLUETOOTHHANDLER
 import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
 import com.example.myapplication.Constants.KEY_TEMP_DATA
 import com.jjoe64.graphview.GraphView
@@ -18,7 +20,6 @@ import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import kotlin.math.pow
 
-
 enum class BatteryStates (val value: UInt){
 	Normal(0U),
 	Battery_low(1U),
@@ -29,11 +30,11 @@ enum class BatteryStates (val value: UInt){
 class DataPresenter : AppCompatActivity()
 {
 	private lateinit var deviceMacAddress: String
-	private lateinit var tvData: TextView
 	private lateinit var tvMacAddress: TextView
 	private lateinit var tvBatteryLevel: TextView
 	private lateinit var ivBatteryState: ImageView
 	private lateinit var graphView: GraphView
+	private lateinit var bluetoothConnectionHandler: BluetoothConnectionHandler
 	private var temperatureDifferenceArray: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
 	private var temperatureDifferenceArrayDouble: DoubleArray? = DoubleArray(sizeTemperatureDifferenceArray)
 	private var batteryLevelStateArray: ByteArray? = ByteArray(sizeBatteryLevel)
@@ -41,6 +42,8 @@ class DataPresenter : AppCompatActivity()
 	private var dataPacketCounter: Int = 0 // datapacket counter endless
 	private var temperatureArrayList = ArrayList<DoubleArray>(numberOfDataArraysReceived)
 	private var jsonEntryList = ArrayList<JsonEntry>()
+
+
 
 	companion object {
 		const val TAG = "DataPresenter"
@@ -70,6 +73,7 @@ class DataPresenter : AppCompatActivity()
 		this.deviceMacAddress = intent.getStringExtra(KEY_DEVICE_ADDRESS).toString()
 		this.tvMacAddress.text = deviceMacAddress
 		this.graphView =  findViewById(R.id.GraphView)
+		bluetoothConnectionHandler = BluetoothConnectionManager.connectionHandler
 
 		Log.d(TAG, "DataPresenter created: $deviceMacAddress")
 	}
@@ -102,7 +106,10 @@ class DataPresenter : AppCompatActivity()
 		val currentTemperatureDifferencePoints = convertArrayToDataPoints()
 		// Update GUI
 		CoroutineScope(Dispatchers.Main).launch {
-			updateBattery(batteryVoltageLevelVolt)
+			if (batteryVoltageLevelVolt != null)
+			{
+				updateBattery(batteryVoltageLevelVolt)
+			}
 		}
 		CoroutineScope(Dispatchers.Main).launch {
 			updateGraph(currentTemperatureDifferencePoints)
@@ -152,29 +159,22 @@ class DataPresenter : AppCompatActivity()
 	private fun updateBattery(batteryVoltageLevelVolt: Double?) {
 		val df = DecimalFormat("#.##")
 		tvBatteryLevel.text = df.format(batteryVoltageLevelVolt).toString() + 'V'
-
 		if (batteryVoltageLevelVolt != null) {
 			if(batteryVoltageLevelVolt > 3.0F) {
 				ivBatteryState.setImageResource(R.drawable.battery_full)
 			} else {
 				ivBatteryState.setImageResource(R.drawable.battery_empty)
+
 			}
+
 		}
-
 	}
-
 	private fun updateGraph(currentTemperatureDifferencePoints: Array<DataPoint>) {
 		// show the 60 most actual data points
 		graphView.viewport.scrollToEnd()
 
-		graphView.viewport.setMinX((currentTemperatureDifferencePoints.size.toDouble() -
-				limitDataPacketCounter * sizeTemperatureDifferenceArray) * dataPacketCounter)
-		graphView.viewport.setMaxX(currentTemperatureDifferencePoints.size.toDouble() * dataPacketCounter)
-
-		graphView.viewport.setMinX((currentTemperatureDifferencePoints.size.toDouble()
-				- limitDataPacketCounter * sizeTemperatureDifferenceArray) * dataPacketCounter)
-		graphView.viewport.setMaxX(currentTemperatureDifferencePoints.size.toDouble()
-				/ dividerDataPointsToMinutes * dataPacketCounter)
+		graphView.viewport.setMinX(sizeTemperatureDifferenceArray.toDouble() * (dataPacketCounter - limitDataPacketCounter) / dividerDataPointsToMinutes)
+		graphView.viewport.setMaxX(sizeTemperatureDifferenceArray.toDouble() * dataPacketCounter / dividerDataPointsToMinutes)
 
 		graphView.viewport.isXAxisBoundsManual = true
 		graphView.viewport.isScrollable = true
@@ -194,7 +194,7 @@ class DataPresenter : AppCompatActivity()
 		val flattenedArray = temperatureArrayList.flatMap { it.asIterable() }.toDoubleArray()
 		return flattenedArray.let {
 			val dataPoints = Array(limitDataPacketCounter * sizeTemperatureDifferenceArray) { i ->
-				DataPoint(i.toDouble() / dividerDataPointsToMinutes, it[i] / temperatureDifferenceTenth)
+				DataPoint((dataPacketCounter - limitDataPacketCounter) * sizeTemperatureDifferenceArray + i.toDouble() / dividerDataPointsToMinutes, it[i] / temperatureDifferenceTenth)
 			}
 			dataPoints
 		}
@@ -203,5 +203,12 @@ class DataPresenter : AppCompatActivity()
 	//UInt to Enum
 	private inline fun <reified T : Enum<T>> UInt.toEnum(): T? {
 		return enumValues<T>().firstOrNull { it.ordinal.toUInt() == this }
+	}
+
+	@SuppressLint("MissingPermission")
+	fun btStop(view: View) {
+		bluetoothConnectionHandler.disconnect()
+		val intent = Intent(this, MainActivity::class.java)
+		startActivity(intent)
 	}
 }

@@ -24,4 +24,6 @@
     <string name="voltage">V</string>
     <string name="connect_to_device">Connect to Device</string>
     <string name="temperature_difference_k_vs_time_min">Temperature difference [K] vs. time [min]</string>
+    <string name="stop">Disconnect</string>
+    <string name="power">Power</string>
 </resources>

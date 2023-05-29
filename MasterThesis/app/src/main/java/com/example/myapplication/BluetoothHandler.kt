@@ -14,11 +14,16 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Handler
 import android.util.Log
+import com.example.myapplication.Constants.KEY_BLUETOOTHHANDLER
 import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
 import com.example.myapplication.Constants.KEY_TEMP_DATA
 import java.util.UUID
 
-private const val SCAN_DURATION_MS = 5000L
+
+object BluetoothConnectionManager {
+	@SuppressLint("StaticFieldLeak")
+	lateinit var connectionHandler: BluetoothConnectionHandler
+}
 
 @SuppressLint("MissingPermission")
 class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCallback() {
@@ -27,6 +32,7 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 	private val bondStateReceiver = BondStateReceiver()
 	private val bondFilter = IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
 	private val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+	private lateinit var gattHandler: BluetoothGatt
 
 	companion object {
 		private const val TAG = "BluetoothHandler"
@@ -40,6 +46,7 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 		Log.d(TAG, "Creating BluetoothConnectionHandler")
 		context.registerReceiver(bondStateReceiver, bondFilter)
 	}
+
 
 	fun connectOrBondSensor()
 	{
@@ -106,6 +113,7 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 		super.onConnectionStateChange(gatt, status, newState)
 		if (newState == BluetoothProfile.STATE_CONNECTED) {
 			Log.d(TAG, "${gatt.device.address} connected")
+			gattHandler = gatt
 			gatt.discoverServices()
 			startNewDataPresenter(gatt.device.address)
 
@@ -135,6 +143,11 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 			Log.e(TAG, "${gatt.device.address} service discovery failed")
 			gatt.disconnect()
 		}
+	}
+
+	fun disconnect()
+	{
+		gattHandler.disconnect()
 	}
 
 	private fun startNewDataPresenter(targetDeviceAddress: String)
@@ -215,11 +228,9 @@ class BluetoothScanHandler(private var deviceList: MutableList<BluetoothDevice>,
 			SCAN_FAILED_INTERNAL_ERROR -> Log.d(TAG, "Scan failed, internal error")
 			SCAN_FAILED_OUT_OF_HARDWARE_RESOURCES ->
 			{
-				TODO()
 			}
 			SCAN_FAILED_SCANNING_TOO_FREQUENTLY ->
 			{
-				TODO()
 			}
 		}
 	}

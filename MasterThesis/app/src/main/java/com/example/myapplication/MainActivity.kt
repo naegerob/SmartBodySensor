@@ -10,7 +10,6 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -27,7 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: DeviceAdapter
     private val deviceList = mutableListOf<BluetoothDevice>()
     private lateinit var recyclerView: RecyclerView
-    private lateinit var progessDialog: Dialog
+    private lateinit var progressDialog: Dialog
 
     // Bluetooth Handlers
     private lateinit var bleScanHandler: BluetoothScanHandler
@@ -43,17 +42,19 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        recyclerView = findViewById<RecyclerView>(R.id.rvDeviceList)
+        recyclerView = findViewById(R.id.rvDeviceList)
         adapter = DeviceAdapter(this, deviceList)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+        bluetoothConnectionHandler = BluetoothConnectionHandler(this)
+        BluetoothConnectionManager.connectionHandler = bluetoothConnectionHandler
 
         bleScanHandler = BluetoothScanHandler(deviceList, adapter)
-        bluetoothConnectionHandler = BluetoothConnectionHandler(this)
+
         printInfo("Enable GPS!")
         // Check for BLE
         configBLE()
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         Log.d("MainActivity", "onCreate called")
     }
 
@@ -94,7 +95,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     @SuppressLint("MissingPermission")
     fun btConnectSensor(view: View) {
         printInfo("Connect to Sensor")
@@ -106,13 +106,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun showProgressDialog()
     {
-        progessDialog = Dialog(this)
-        progessDialog.setContentView(R.layout.dialog_progress)
-        progessDialog.show()
-    }
-    private fun cancelProgressDialog()
-    {
-        progessDialog.cancel()
+        progressDialog = Dialog(this)
+        progressDialog.setContentView(R.layout.dialog_progress)
+        progressDialog.show()
     }
 
 }
