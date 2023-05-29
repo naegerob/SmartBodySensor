@@ -3,12 +3,12 @@ package com.example.myapplication
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.myapplication.Constants.KEY_BLUETOOTHHANDLER
 import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
 import com.example.myapplication.Constants.KEY_TEMP_DATA
 import com.jjoe64.graphview.GraphView
@@ -19,6 +19,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import kotlin.math.pow
+import com.google.gson.Gson
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
 
 enum class BatteryStates (val value: UInt){
 	Normal(0U),
@@ -124,10 +129,40 @@ class DataPresenter : AppCompatActivity()
 	{
 		for (i in 0 until sizeTemperatureDifferenceArray)
 		{
-			val jsonEntry = JsonEntry(sizeTemperatureDifferenceArray * (dataPacketCounter - 1)+ i,
-				temperatureDifferenceArrayDouble?.get(i), batteryVoltageLevelVolt)
+			val jsonEntry = JsonEntry(
+				sizeTemperatureDifferenceArray * (dataPacketCounter - 1) + i,
+				temperatureDifferenceArrayDouble?.get(i)?.div(10), batteryVoltageLevelVolt)
 			jsonEntryList.add(jsonEntry)
 		}
+		val jsonSeries = Gson().toJson(jsonEntryList)
+		val path = System.getProperty("user.dir")
+		if (path != null) {
+			Log.d(TAG, path)
+		}
+		// Pfad: internal/Android/com.example.myapplication/files/Documents/
+		try {
+			val fileName = "log2.json"
+
+			val externalDocumentsDir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+			val directoryName = "logs2"
+			val directory = File(externalDocumentsDir, directoryName)
+			if (!directory.exists()) {
+				directory.mkdirs()
+			}
+			Log.d(TAG, directory.toString())
+			val jsonFile = File(directory, fileName)
+			val fileOutputStream = FileOutputStream(jsonFile)
+			fileOutputStream.write(jsonSeries.toByteArray())
+			fileOutputStream.close()
+		} catch (e: IOException)
+		{
+			e.printStackTrace()
+		} catch (e: FileNotFoundException)
+		{
+			e.printStackTrace()
+		}
+
+		Log.d(TAG, jsonSeries)
 	}
 
 	private fun limitNumberDataAndIncreaseCounter()
@@ -164,7 +199,6 @@ class DataPresenter : AppCompatActivity()
 				ivBatteryState.setImageResource(R.drawable.battery_full)
 			} else {
 				ivBatteryState.setImageResource(R.drawable.battery_empty)
-
 			}
 
 		}

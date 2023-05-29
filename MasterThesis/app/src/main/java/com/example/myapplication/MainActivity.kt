@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.google.gson.Gson
 
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
