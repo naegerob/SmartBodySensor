@@ -1,9 +1,7 @@
 package com.example.myapplication
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.bluetooth.*
-import android.bluetooth.BluetoothClass.Device
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
@@ -14,10 +12,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Handler
 import android.util.Log
-import com.example.myapplication.Constants.KEY_BLUETOOTHHANDLER
 import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
 import com.example.myapplication.Constants.KEY_TEMP_DATA
-import java.util.UUID
+import java.util.*
 
 
 object BluetoothConnectionManager {
