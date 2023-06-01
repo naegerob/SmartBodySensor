@@ -51,12 +51,6 @@ h
 app/.gitignore,5\1\51e1c5d383dfaa35e0e7e5873a0a99355a86880f
 R
 "app/src/main/res/values/colors.xml,9\6\969faa2a5d9f5e8390e958d2c07f2cfd54676e6b
-l
-<app/src/main/java/com/example/myapplication/DeviceAdapter.kt,8\0\80fcf2c1e17f4deba9d1c4f14d0b9ac1275689b4
-h
-8app/src/main/java/com/example/myapplication/Constants.kt,7\e\7e4d0b54b8202c7f30b0c70e65fe92b4c34a57d7
-o
-?app/src/main/java/com/example/myapplication/BluetoothHandler.kt,1\a\1abc8e668bedbcc8e1f5edc5d52613976e2cfae3
 x
 Hbenchmark/src/main/java/com/example/benchmark/ExampleStartupBenchmark.kt,c\5\c5390b20cda05512e023cf151bf4af3bdfed13b7
 P
@@ -67,11 +61,3 @@ P
 app/build.gradle,f\4\f4a01d6a4fcb971362ec00a83903fd3902f52164
 ?
 settings.gradle,0\5\05efc8b1657769a27696d478ded1e95f38737233
-o
-?app/src/main/java/com/example/myapplication/BluetoothDevices.kt,6\8\687c2d1ba044236ad64e5faad1b2355d01e8434c
-n
->app/src/main/java/com/example/myapplication/JsonRepresenter.kt,0\8\08a42b5741fee52a9fefbbee44eaa2199cd02366
-k
-;app/src/main/java/com/example/myapplication/MainActivity.kt,0\0\00ed33bb9fa3f2577abe71150520b83c93b6af18
-l
-<app/src/main/java/com/example/myapplication/DataPresenter.kt,a\e\ae9c14c188c32d8260e47abb7789414d2cde45ef

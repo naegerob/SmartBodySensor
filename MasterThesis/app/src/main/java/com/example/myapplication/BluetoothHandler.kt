@@ -76,7 +76,8 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 	 */
 
 	@Deprecated("Deprecated in Java, but used for API 12 and lower")
-	override fun onCharacteristicRead(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic, status: Int) {
+	override fun onCharacteristicRead(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic, status: Int)
+	{
 		super.onCharacteristicRead(gatt, characteristic, status)
 		if (status == BluetoothGatt.GATT_SUCCESS) {
 			characteristic.let { char ->
@@ -92,7 +93,8 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 	}
 
 	@Deprecated("Deprecated in Java, but used for API 12 and lower")
-	override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+	override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic)
+	{
 		super.onCharacteristicChanged(gatt, characteristic)
 		if (characteristic.uuid == UUID_HEART_RATE_CHARACTERISTICS) {
 			val byteArray: ByteArray? = characteristic.value
@@ -109,7 +111,8 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 
 		}
 	}
-	override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+	override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int)
+	{
 		super.onConnectionStateChange(gatt, status, newState)
 		if (newState == BluetoothProfile.STATE_CONNECTED) {
 			Log.d(TAG, "${gatt.device.address} connected")
@@ -123,7 +126,8 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 		}
 	}
 
-	override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
+	override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int)
+	{
 		super.onServicesDiscovered(gatt, status)
 		if (status == BluetoothGatt.GATT_SUCCESS) {
 			Log.d(TAG, "${gatt.device.address} services discovered")
@@ -247,7 +251,8 @@ class BondStateReceiver : BroadcastReceiver() {
 		Log.d(TAG, "OnReceive called")
 		val action = intent?.action
 
-		if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == action) {
+		if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == action)
+		{
 			val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
 			when (intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR)) {
 				BluetoothDevice.BOND_BONDED -> {

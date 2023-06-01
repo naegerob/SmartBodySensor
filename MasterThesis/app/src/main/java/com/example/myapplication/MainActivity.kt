@@ -12,14 +12,12 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.google.gson.Gson
 
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
@@ -40,7 +38,8 @@ class MainActivity : AppCompatActivity() {
     /***
      * Methods
      */
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         recyclerView = findViewById(R.id.rvDeviceList)
@@ -62,7 +61,8 @@ class MainActivity : AppCompatActivity() {
     /*
      *  Check for BLE enabling of the device
      */
-    private fun configBLE() {
+    private fun configBLE()
+    {
         if (!bleScanHandler.checkBLE()) {
             printInfo("BLE adapter is null")
             return
@@ -84,20 +84,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun printInfo(msg: String) {
+    private fun printInfo(msg: String)
+    {
         val textview: TextView = findViewById(R.id.tvDeviceInfo)
         textview.text = msg
     }
 
     @SuppressLint("MissingPermission")
-    fun btScan(view: View) {
+    fun btScan(view: View)
+    {
         printInfo("start BLE Scan")
         bleScanHandler.startScan()
     }
 
 
     @SuppressLint("MissingPermission")
-    fun btConnectSensor(view: View) {
+    fun btConnectSensor()
+    {
         printInfo("Connect to Sensor")
         CoroutineScope(Dispatchers.Main).launch {
             showProgressDialog()

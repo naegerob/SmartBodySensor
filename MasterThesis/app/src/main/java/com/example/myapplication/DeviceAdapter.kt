@@ -14,14 +14,16 @@ import androidx.recyclerview.widget.RecyclerView
 class DeviceAdapter(private val context: Context, private val deviceList: List<BluetoothDevice>) :
     RecyclerView.Adapter<DeviceViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder
+    {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.list_item_device, parent, false) //TODO: what if without parent.context?
         Log.d("DeviceAdapter", "OnCreateViewHolder called")
         return DeviceViewHolder(view)
     }
 
-    override fun getItemCount(): Int {
+    override fun getItemCount(): Int
+    {
         return deviceList.size
     }
 
@@ -33,9 +35,6 @@ class DeviceAdapter(private val context: Context, private val deviceList: List<B
         holder.bind(device)
         Log.d("DeviceAdapter", "onBindViewHolder called")
         holder.itemView.setOnClickListener {
-            // Handle clicks on recyclerView
-            // Connect to device
-            //bluetoothConnectionHandler.connectOrBondSensor()
         }
 
         // Hintergrundfarbe aktualisieren, basierend auf gerader oder ungerader Position in der Liste.
@@ -59,7 +58,8 @@ class DeviceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val deviceAddress: TextView = itemView.findViewById(R.id.tvdevice_address)
 
     @SuppressLint("MissingPermission")
-    fun bind(device: BluetoothDevice) {
+    fun bind(device: BluetoothDevice)
+    {
         Log.d(
             "DeviceViewHolder",
             "bind called " + device.name.toString() + " " + device.address.toString()
