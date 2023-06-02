@@ -17,7 +17,7 @@ class DeviceAdapter(private val context: Context, private val deviceList: List<B
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder
     {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.list_item_device, parent, false) //TODO: what if without parent.context?
+            LayoutInflater.from(parent.context).inflate(R.layout.list_item_device, parent, false)
         Log.d("DeviceAdapter", "OnCreateViewHolder called")
         return DeviceViewHolder(view)
     }
@@ -30,7 +30,6 @@ class DeviceAdapter(private val context: Context, private val deviceList: List<B
     @SuppressLint("MissingPermission")
     override fun onBindViewHolder(holder: DeviceViewHolder, position: Int) {
         val device = deviceList[position]
-
 
         holder.bind(device)
         Log.d("DeviceAdapter", "onBindViewHolder called")

@@ -35,6 +35,7 @@ class DataPresenter : AppCompatActivity() {
     private lateinit var deviceMacAddress: String
     private lateinit var tvMacAddress: TextView
     private lateinit var tvBatteryLevel: TextView
+    private lateinit var tvCurrentPower: TextView
     private lateinit var ivBatteryState: ImageView
     private lateinit var graphView: GraphView
     private lateinit var bluetoothConnectionHandler: BluetoothConnectionHandler
@@ -64,6 +65,12 @@ class DataPresenter : AppCompatActivity() {
         const val maskBits0To5 = 0x3FU
         const val maskBits0To13: UShort = 0x3FFFU
         const val maskBits6To7 = 0xC0U
+        private const val bodyTemperature = 36		// °C
+        private const val ambientTemperature = 26		// °C
+        private const val ocVoltageMeasured = 45		// mV
+        // in 1mV/K
+        const val seebeck_coefficient = ocVoltageMeasured/(bodyTemperature - ambientTemperature)		// 100*uV/K -> Measured Seebeck-Coefficient of 4 TEG1-30-30 in serie
+        const val innerResistanceTEG = 6.8 // two times 4 TEGs with 3.4Ohm in series and parallel
     }
 
     override fun onCreate(savedInstanceState: Bundle?)
@@ -136,6 +143,11 @@ class DataPresenter : AppCompatActivity() {
         limitNumberDataAndIncreaseCounter()
 
         val currentTemperatureDifferencePoints = convertArrayToDataPoints()
+
+        val power = (temperatureDifferenceArrayDouble?.average()?.times(seebeck_coefficient))?.pow(2)
+            ?.div((4 * innerResistanceTEG))
+        val df = DecimalFormat("#.##")
+        tvCurrentPower.text = df.format(power).toString() + "mW"
         // Update GUI
         CoroutineScope(Dispatchers.Main).launch {
             if (batteryVoltageLevelVolt != null) {
