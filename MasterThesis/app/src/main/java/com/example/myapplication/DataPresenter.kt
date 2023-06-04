@@ -48,6 +48,7 @@ class DataPresenter : AppCompatActivity() {
     private var temperatureArrayList = ArrayList<DoubleArray>(numberOfDataArraysReceived)
     private var jsonEntryList = ArrayList<JsonEntry>()
     private lateinit var fileOutputStream: FileOutputStream
+    private lateinit var jsonFile: File
 
 
     companion object {
@@ -69,7 +70,7 @@ class DataPresenter : AppCompatActivity() {
         private const val ambientTemperature = 26		// °C
         private const val ocVoltageMeasured = 45		// mV
         // in 1mV/K
-        const val seebeck_coefficient = ocVoltageMeasured/(bodyTemperature - ambientTemperature)		// 100*uV/K -> Measured Seebeck-Coefficient of 4 TEG1-30-30 in serie
+        const val seebeck_coefficient = ocVoltageMeasured/(bodyTemperature - ambientTemperature)		// Measured Seebeck-Coefficient of 4 TEG1-30-30 in serie
         const val innerResistanceTEG = 6.8 // two times 4 TEGs with 3.4Ohm in series and parallel
     }
 
@@ -80,6 +81,7 @@ class DataPresenter : AppCompatActivity() {
 
         this.tvMacAddress = findViewById(R.id.tvMacAddress)
         this.tvBatteryLevel = findViewById(R.id.tvBatteryLevel)
+        this.tvCurrentPower = findViewById(R.id.tvCurrentPower)
         this.ivBatteryState = findViewById(R.id.ivBatteryState)
         this.deviceMacAddress = intent.getStringExtra(KEY_DEVICE_ADDRESS).toString()
         this.tvMacAddress.text = deviceMacAddress
@@ -87,29 +89,29 @@ class DataPresenter : AppCompatActivity() {
         bluetoothConnectionHandler = BluetoothConnectionManager.connectionHandler
         createJsonPath()
         Log.d(TAG, "DataPresenter created: $deviceMacAddress")
-
     }
 
     private fun createJsonPath()
 	{
         val path = System.getProperty("user.dir")
-        if (path != null) {
+        if (path != null)
+        {
             Log.d(TAG, path)
         }
         // Pfad: internal/Android/com.example.myapplication/files/Documents/
         try {
-            val timeStamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
-            val fileName = "log_$timeStamp.json"
-
             val externalDocumentsDir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-            val directoryName = "logs2"
+            val directoryName = "SmartBodySensor_logs"
             val directory = File(externalDocumentsDir, directoryName)
             if (!directory.exists()) {
                 directory.mkdirs()
             }
+
+            val timeStamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+            val fileName = "log_$timeStamp.json"
+            jsonFile = File(directory, fileName)
             Log.d(TAG, directory.toString())
-            val jsonFile = File(directory, fileName)
-            fileOutputStream = FileOutputStream(jsonFile)
+
         } catch (e: IOException) {
             e.printStackTrace()
         } catch (e: FileNotFoundException) {
@@ -123,7 +125,7 @@ class DataPresenter : AppCompatActivity() {
      * Also a conversion from byteArray to a LineGraphSeries with DataPoint is made
      * byteArray -> ArrayList<Double[]> -> Double[] -> DataPoints[] -> LineGraphSeries[DataPoint]
      */
-	override fun onNewIntent(dataPresenterIntent: Intent?)
+    override fun onNewIntent(dataPresenterIntent: Intent?)
 	{
         super.onNewIntent(dataPresenterIntent)
 
@@ -144,21 +146,24 @@ class DataPresenter : AppCompatActivity() {
 
         val currentTemperatureDifferencePoints = convertArrayToDataPoints()
 
-        val power = (temperatureDifferenceArrayDouble?.average()?.times(seebeck_coefficient))?.pow(2)
-            ?.div((4 * innerResistanceTEG))
-        val df = DecimalFormat("#.##")
-        tvCurrentPower.text = df.format(power).toString() + "mW"
+
         // Update GUI
         CoroutineScope(Dispatchers.Main).launch {
-            if (batteryVoltageLevelVolt != null) {
-                updateBattery(batteryVoltageLevelVolt)
+            updatePower()
+        }
+        CoroutineScope(Dispatchers.Main).launch {
+            batteryVoltageLevelVolt?.let {
+                updateBattery(it)
             }
         }
         CoroutineScope(Dispatchers.Main).launch {
             updateGraph(currentTemperatureDifferencePoints)
         }
+        // Store in json file
+        CoroutineScope(Dispatchers.IO).launch {
+            convertJson(batteryVoltageLevelVolt)
+        }
 
-        convertJson(batteryVoltageLevelVolt)
 
         Log.d(TAG, "At the end!")
     }
@@ -173,12 +178,18 @@ class DataPresenter : AppCompatActivity() {
             )
             jsonEntryList.add(jsonEntry)
         }
-        val jsonSeries = Gson().toJson(jsonEntryList)
-        fileOutputStream.write(jsonSeries.toByteArray())
-        fileOutputStream.close()
 
-
-        Log.d(TAG, jsonSeries)
+        try
+        {
+            val jsonSeries = Gson().toJson(jsonEntryList)
+            fileOutputStream = FileOutputStream(jsonFile)
+            fileOutputStream.write(jsonSeries.toByteArray())
+            fileOutputStream.close()
+            Log.d(TAG, jsonSeries)
+        } catch (e :Exception)
+        {
+            e.printStackTrace()
+        }
     }
 
     private fun limitNumberDataAndIncreaseCounter()
@@ -208,6 +219,7 @@ class DataPresenter : AppCompatActivity() {
         return Pair(batteryState, batteryVoltageLevelVolt)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateBattery(batteryVoltageLevelVolt: Double?)
 	{
         val df = DecimalFormat("#.##")
@@ -220,6 +232,15 @@ class DataPresenter : AppCompatActivity() {
             }
 
         }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updatePower()
+    {
+        val powerInuW = (temperatureDifferenceArrayDouble?.average()?.times(seebeck_coefficient))?.pow(2)
+            ?.div(4 * innerResistanceTEG * 100) // 100: divider because ten times temperature Difference.
+        val df = DecimalFormat("#.#")
+        tvCurrentPower.text = df.format(powerInuW).toString() + "uW"
     }
 
     private fun updateGraph(currentTemperatureDifferencePoints: Array<DataPoint>)

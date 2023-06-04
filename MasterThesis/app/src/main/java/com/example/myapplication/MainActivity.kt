@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
 
 
     @SuppressLint("MissingPermission")
-    fun btConnectSensor()
+    fun btConnectSensor(view: View)
     {
         printInfo("Connect to Sensor")
         CoroutineScope(Dispatchers.Main).launch {
