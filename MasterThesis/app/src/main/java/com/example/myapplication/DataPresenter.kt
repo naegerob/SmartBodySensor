@@ -272,7 +272,8 @@ class DataPresenter : AppCompatActivity() {
         return flattenedArray.let {
             val dataPoints = Array(limitDataPacketCounter * sizeTemperatureDifferenceArray) { i ->
                 DataPoint(
-                    (dataPacketCounter - limitDataPacketCounter) * sizeTemperatureDifferenceArray + i.toDouble() / dividerDataPointsToMinutes,
+                    // The calculation for the x axis is for the
+                    ((dataPacketCounter - limitDataPacketCounter) * sizeTemperatureDifferenceArray + i.toDouble()) / dividerDataPointsToMinutes,
                     it[i] / temperatureDifferenceTenth
                 )
             }
