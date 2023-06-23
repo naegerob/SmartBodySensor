@@ -59,13 +59,9 @@ class DeviceAdapter(private val context: Context, private val deviceList: List<B
                 "DeviceViewHolder",
                 "bind called " + device.name.toString() + " " + device.address.toString()
             )
-            if (device.name != null) {
-                deviceName.text = device.name
-            } else {
-                deviceName.text = "null"
-            }
-            deviceAddress.text = device.address
 
+            deviceName.text = device.name ?: "null"
+            deviceAddress.text = device.address
         }
     }
 

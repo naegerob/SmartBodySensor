@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         printInfo("Enable GPS!")
         // Check for BLE
         configBLE()
-        //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
         Log.d("MainActivity", "onCreate called")
     }
 

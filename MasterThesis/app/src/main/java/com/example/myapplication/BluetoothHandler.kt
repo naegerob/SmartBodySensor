@@ -10,8 +10,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Handler
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.example.myapplication.Constants.KEY_DEVICE_ADDRESS
 import com.example.myapplication.Constants.KEY_TEMP_DATA
 import java.util.*
@@ -219,20 +221,27 @@ class BluetoothScanHandler(private var deviceList: MutableList<BluetoothDevice>,
 			Log.d(TAG, "onScanResult called")
 		}
 	}
+
 	override fun onScanFailed(errorCode: Int) {
 		super.onScanFailed(errorCode)
 		// Handle scan failures
 		when (errorCode) {
-			SCAN_FAILED_ALREADY_STARTED -> Log.d(TAG, "Scan failed, already started")
-			SCAN_FAILED_APPLICATION_REGISTRATION_FAILED -> Log.d(TAG, "Scan failed, application registration failed")
-			SCAN_FAILED_FEATURE_UNSUPPORTED -> Log.d(TAG, "Scan failed, feature unsupported")
-			SCAN_FAILED_INTERNAL_ERROR -> Log.d(TAG, "Scan failed, internal error")
-			SCAN_FAILED_OUT_OF_HARDWARE_RESOURCES ->
-			{
+			SCAN_FAILED_ALREADY_STARTED -> {
+				Log.d(TAG, "Scan failed, already started")
 			}
-			SCAN_FAILED_SCANNING_TOO_FREQUENTLY ->
-			{
+			SCAN_FAILED_APPLICATION_REGISTRATION_FAILED -> {
+				Log.d(
+					TAG,
+					"Scan failed, application registration failed"
+				)
 			}
+			SCAN_FAILED_FEATURE_UNSUPPORTED -> {
+				Log.d(TAG, "Scan failed, feature unsupported")
+			}
+			SCAN_FAILED_INTERNAL_ERROR -> {
+				Log.d(TAG, "Scan failed, internal error")
+			}
+
 		}
 	}
 }
