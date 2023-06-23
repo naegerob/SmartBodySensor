@@ -37,8 +37,6 @@ W
 'app/src/main/res/values-land/dimens.xml,e\8\e8fe653669acbc46bcb1330f4532eee3bf9ac4c3
 h
 8app/src/main/res/drawable-v24/ic_launcher_foreground.xml,0\7\078508c831007ccb3938b355f0d30a8368f99a8d
-X
-(app/src/main/res/values-night/themes.xml,8\c\8c3a6b96d9ffba496992e612d58227c19e6b9e65
 Y
 )app/src/main/res/values-w600dp/dimens.xml,d\d\dd50348f0e0e40d34f7eef693f331545006a3150
 b

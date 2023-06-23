@@ -12,18 +12,16 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class DeviceAdapter(private val context: Context, private val deviceList: List<BluetoothDevice>) :
-    RecyclerView.Adapter<DeviceViewHolder>() {
+    RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder
-    {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.list_item_device, parent, false)
         Log.d("DeviceAdapter", "OnCreateViewHolder called")
         return DeviceViewHolder(view)
     }
 
-    override fun getItemCount(): Int
-    {
+    override fun getItemCount(): Int {
         return deviceList.size
     }
 
@@ -49,26 +47,26 @@ class DeviceAdapter(private val context: Context, private val deviceList: List<B
         }
 
     }
-}
 
 
-class DeviceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val deviceName: TextView = itemView.findViewById(R.id.tvdevice_name)
-    private val deviceAddress: TextView = itemView.findViewById(R.id.tvdevice_address)
+    class DeviceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val deviceName: TextView = itemView.findViewById(R.id.tvdevice_name)
+        private val deviceAddress: TextView = itemView.findViewById(R.id.tvdevice_address)
 
-    @SuppressLint("MissingPermission")
-    fun bind(device: BluetoothDevice)
-    {
-        Log.d(
-            "DeviceViewHolder",
-            "bind called " + device.name.toString() + " " + device.address.toString()
-        )
-        if (device.name != null) {
-            deviceName.text = device.name
-        } else {
-            deviceName.text = "null"
+        @SuppressLint("MissingPermission")
+        fun bind(device: BluetoothDevice) {
+            Log.d(
+                "DeviceViewHolder",
+                "bind called " + device.name.toString() + " " + device.address.toString()
+            )
+            if (device.name != null) {
+                deviceName.text = device.name
+            } else {
+                deviceName.text = "null"
+            }
+            deviceAddress.text = device.address
+
         }
-        deviceAddress.text = device.address
-
     }
+
 }
