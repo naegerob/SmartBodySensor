@@ -98,7 +98,7 @@ class DataPresenter : AppCompatActivity() {
         {
             Log.d(TAG, path)
         }
-        // Pfad: internal/Android/com.example.myapplication/files/Documents/
+        // Pfad: internal/Android/data/com.example.myapplication/files/Documents/
         try {
             val externalDocumentsDir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
             val directoryName = "SmartBodySensor_logs"
