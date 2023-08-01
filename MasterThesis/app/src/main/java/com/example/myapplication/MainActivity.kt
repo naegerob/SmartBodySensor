@@ -18,6 +18,12 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import kotlinx.coroutines.*
 
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
@@ -26,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     private val deviceList = mutableListOf<BluetoothDevice>()
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressDialog: Dialog
+    private lateinit var httpClient: io.ktor.client.HttpClient
 
     // Bluetooth Handlers
     private lateinit var bleScanHandler: BluetoothScanHandler
@@ -48,14 +55,30 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         bluetoothConnectionHandler = BluetoothConnectionHandler(this)
         BluetoothConnectionManager.connectionHandler = bluetoothConnectionHandler
-
+        httpClient = HttpClient(CIO)
         bleScanHandler = BluetoothScanHandler(deviceList, adapter)
 
         printInfo("Enable GPS!")
         // Check for BLE
         configBLE()
 
+
+        val job = CoroutineScope(Dispatchers.IO).launch {
+            val response = httpClient.request("http://192.168.56.1:8080") {
+                method = HttpMethod.Get
+            }
+
+            Log.d(TAG, response.toString())
+        }
+
+        runBlocking {
+            job.join()
+        }
+
+
         Log.d("MainActivity", "onCreate called")
+
+
     }
 
     /*

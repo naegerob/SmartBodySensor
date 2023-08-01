@@ -1,6 +1,4 @@
 
-F
-app/proguard-rules.pro,9\e\9e08934d811afe28fbc77aaa3c0d747b94348db9
 n
 >app/src/test/java/com/example/myapplication/ExampleUnitTest.kt,e\1\e110aede2d9b606b5e7c8b653b7e7a4905cf45b6
 }
@@ -51,23 +49,31 @@ R
 "app/src/main/res/values/colors.xml,9\6\969faa2a5d9f5e8390e958d2c07f2cfd54676e6b
 x
 Hbenchmark/src/main/java/com/example/benchmark/ExampleStartupBenchmark.kt,c\5\c5390b20cda05512e023cf151bf4af3bdfed13b7
-P
- app/src/main/AndroidManifest.xml,8\c\8c55c3ccc257e5907959013f99656e4c8ec3903e
-<
-build.gradle,f\0\f07866736216be0ee2aba49e392191aeae700a35
-@
-app/build.gradle,f\4\f4a01d6a4fcb971362ec00a83903fd3902f52164
+l
+<app/src/main/java/com/example/myapplication/DeviceAdapter.kt,8\0\80fcf2c1e17f4deba9d1c4f14d0b9ac1275689b4
 h
 8app/src/main/java/com/example/myapplication/Constants.kt,7\e\7e4d0b54b8202c7f30b0c70e65fe92b4c34a57d7
 ?
 settings.gradle,0\5\05efc8b1657769a27696d478ded1e95f38737233
-k
-;app/src/main/java/com/example/myapplication/MainActivity.kt,0\0\00ed33bb9fa3f2577abe71150520b83c93b6af18
+X
+(gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
+P
+ app/src/main/AndroidManifest.xml,8\c\8c55c3ccc257e5907959013f99656e4c8ec3903e
+F
+app/proguard-rules.pro,9\e\9e08934d811afe28fbc77aaa3c0d747b94348db9
+A
+gradle.properties,2\a\2afbb999f001938c88fa43fc2ef52abf0f8213e4
+<
+build.gradle,f\0\f07866736216be0ee2aba49e392191aeae700a35
+F
+benchmark/build.gradle,8\f\8f7e28a1d7e0962aabd9dbab5a371ce898a7abb4
+@
+app/build.gradle,f\4\f4a01d6a4fcb971362ec00a83903fd3902f52164
 o
 ?app/src/main/java/com/example/myapplication/BluetoothHandler.kt,1\a\1abc8e668bedbcc8e1f5edc5d52613976e2cfae3
-l
-<app/src/main/java/com/example/myapplication/DeviceAdapter.kt,8\0\80fcf2c1e17f4deba9d1c4f14d0b9ac1275689b4
 n
 >app/src/main/java/com/example/myapplication/JsonRepresenter.kt,0\8\08a42b5741fee52a9fefbbee44eaa2199cd02366
 l
 <app/src/main/java/com/example/myapplication/DataPresenter.kt,a\e\ae9c14c188c32d8260e47abb7789414d2cde45ef
+k
+;app/src/main/java/com/example/myapplication/MainActivity.kt,0\0\00ed33bb9fa3f2577abe71150520b83c93b6af18

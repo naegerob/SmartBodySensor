@@ -40,8 +40,7 @@ class DataPresenter : AppCompatActivity() {
     private lateinit var graphView: GraphView
     private lateinit var bluetoothConnectionHandler: BluetoothConnectionHandler
     private var temperatureDifferenceArray: ByteArray? = ByteArray(sizeTemperatureDifferenceArray)
-    private var temperatureDifferenceArrayDouble: DoubleArray? =
-        DoubleArray(sizeTemperatureDifferenceArray)
+    private var temperatureDifferenceArrayDouble: DoubleArray? = DoubleArray(sizeTemperatureDifferenceArray)
     private var batteryLevelStateArray: ByteArray? = ByteArray(sizeBatteryLevel)
     private var limitDataPacketCounter: Int = 0 // datapacket counter up to 5 datapackets
     private var dataPacketCounter: Int = 0 // datapacket counter endless
@@ -49,7 +48,6 @@ class DataPresenter : AppCompatActivity() {
     private var jsonEntryList = ArrayList<JsonEntry>()
     private lateinit var fileOutputStream: FileOutputStream
     private lateinit var jsonFile: File
-
 
     companion object {
         const val TAG = "DataPresenter"
@@ -70,7 +68,7 @@ class DataPresenter : AppCompatActivity() {
         private const val ambientTemperature = 26		// °C
         private const val ocVoltageMeasured = 45		// mV
         // in 1mV/K
-        const val seebeck_coefficient = ocVoltageMeasured/(bodyTemperature - ambientTemperature)		// Measured Seebeck-Coefficient of 4 TEG1-30-30 in serie
+        const val seebeck_coefficient_mVperK = ocVoltageMeasured/(bodyTemperature - ambientTemperature)		// Measured Seebeck-Coefficient of 4 TEG1-30-30 in serie
         const val innerResistanceTEG = 6.8 // two times 4 TEGs with 3.4Ohm in series and parallel
     }
 
@@ -237,7 +235,7 @@ class DataPresenter : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun updatePower()
     {
-        val powerInuW = (temperatureDifferenceArrayDouble?.average()?.times(seebeck_coefficient))?.pow(2)
+        val powerInuW = (temperatureDifferenceArrayDouble?.average()?.times(seebeck_coefficient_mVperK))?.pow(2)
             ?.div(4 * innerResistanceTEG * 100) // 100: divider because ten times temperature Difference.
         val df = DecimalFormat("#.#")
         tvCurrentPower.text = df.format(powerInuW).toString() + "uW"
