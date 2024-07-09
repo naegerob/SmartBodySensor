@@ -55,17 +55,14 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         bluetoothConnectionHandler = BluetoothConnectionHandler(this)
         BluetoothConnectionManager.connectionHandler = bluetoothConnectionHandler
-        val httpClient = HttpClient(CIO) {
-            install(JsonFeature) {
-                serializer = KotlinxSerializer()
-            }
-        }
+
         bleScanHandler = BluetoothScanHandler(deviceList, adapter)
 
         printInfo("Enable GPS!")
         // Check for BLE
         configBLE()
 
+        /*
         val job = CoroutineScope(Dispatchers.IO).launch {
             val response = httpClient.request("http://192.168.56.1:8080") {
                 method = HttpMethod.Get
@@ -76,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         runBlocking {
             job.join()
         }
-
+        */
 
         Log.d("MainActivity", "onCreate called")
 

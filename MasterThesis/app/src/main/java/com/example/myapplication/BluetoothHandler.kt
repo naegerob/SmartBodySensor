@@ -46,7 +46,6 @@ class BluetoothConnectionHandler(private val context: Context) : BluetoothGattCa
 		context.registerReceiver(bondStateReceiver, bondFilter)
 	}
 
-
 	fun connectOrBondSensor()
 	{
 		val btDevice: BluetoothDevice = bluetoothAdapter.getRemoteDevice(tempNode.macAddress)
