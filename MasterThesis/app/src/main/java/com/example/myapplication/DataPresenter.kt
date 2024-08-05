@@ -15,9 +15,14 @@ import com.google.gson.Gson
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.LineGraphSeries
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.request.*
+import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -48,6 +53,9 @@ class DataPresenter : AppCompatActivity() {
     private var jsonEntryList = ArrayList<JsonEntry>()
     private lateinit var fileOutputStream: FileOutputStream
     private lateinit var jsonFile: File
+
+    private lateinit var httpClient: HttpClient
+
 
     companion object {
         const val TAG = "DataPresenter"
@@ -86,6 +94,13 @@ class DataPresenter : AppCompatActivity() {
         this.graphView = findViewById(R.id.GraphView)
         bluetoothConnectionHandler = BluetoothConnectionManager.connectionHandler
         createJsonPath()
+
+        httpClient = HttpClient(CIO) {
+            engine {
+                threadsCount = 4
+                pipelining = true
+            }
+        }
         Log.d(TAG, "DataPresenter created: $deviceMacAddress")
     }
 
@@ -162,19 +177,33 @@ class DataPresenter : AppCompatActivity() {
             convertJson(batteryVoltageLevelVolt)
         }
 
-
         Log.d(TAG, "At the end!")
     }
 
-    private fun convertJson(batteryVoltageLevelVolt: Double?)
+    private suspend fun convertJson(batteryVoltageLevelVolt: Double?)
 	{
+        var jsonEntry: JsonEntry? = null
         for (i in 0 until sizeTemperatureDifferenceArray) {
-            val jsonEntry = JsonEntry(
+            jsonEntry = JsonEntry(
                 sizeTemperatureDifferenceArray * (dataPacketCounter - 1) + i,
                 temperatureDifferenceArrayDouble?.get(i)?.div(10),
                 batteryVoltageLevelVolt
             )
             jsonEntryList.add(jsonEntry)
+        }
+
+        val job = CoroutineScope(Dispatchers.IO).launch {
+            val response = httpClient.request("http://192.168.56.1:8080") {
+                method = HttpMethod.Get
+            }
+            httpClient.post("http://192.168.1.27:8080") {
+                setBody(jsonEntry)
+            }
+            Log.d(TAG, response.toString())
+        }
+
+        runBlocking {
+            job.join()
         }
 
         try

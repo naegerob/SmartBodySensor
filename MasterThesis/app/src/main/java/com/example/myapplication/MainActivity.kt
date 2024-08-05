@@ -32,8 +32,6 @@ class MainActivity : AppCompatActivity() {
     private val deviceList = mutableListOf<BluetoothDevice>()
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressDialog: Dialog
-    private lateinit var httpClient: io.ktor.client.HttpClient
-
     // Bluetooth Handlers
     private lateinit var bleScanHandler: BluetoothScanHandler
     private lateinit var bluetoothConnectionHandler: BluetoothConnectionHandler
@@ -61,20 +59,6 @@ class MainActivity : AppCompatActivity() {
         printInfo("Enable GPS!")
         // Check for BLE
         configBLE()
-
-        /*
-        val job = CoroutineScope(Dispatchers.IO).launch {
-            val response = httpClient.request("http://192.168.56.1:8080") {
-                method = HttpMethod.Get
-            }
-            Log.d(TAG, response.toString())
-        }
-
-        runBlocking {
-            job.join()
-        }
-        */
-
         Log.d("MainActivity", "onCreate called")
 
 
